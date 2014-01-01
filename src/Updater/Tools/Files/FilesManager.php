@@ -30,6 +30,7 @@ class FilesManager
      */
     public function getSpecFromZip($packagesDir, $zipFileName = null)
     {
+        $jsonManager = new JsonManager();
         $packages = array();
 
         foreach (new \RecursiveDirectoryIterator($packagesDir) as $file) {
@@ -38,7 +39,7 @@ class FilesManager
             }
 
             if (!extension_loaded('zip')) {
-                throw new Exception("In order to use private plugins, you need to have zip extension enabled");
+                throw new Exception("You need to have zip extension enabled");
             }
 
             if ($zipFileName != null) {
@@ -47,14 +48,14 @@ class FilesManager
                 }
             }
 
-            $json = JsonManager::getJsonFromFile('update.json', $file->getPathname());
+            $json = $jsonManager->getJsonFromFile('update.json', $file->getPathname());
 
             if ($json == false) {
                 continue;
             }
 
 
-            if (!JsonManager::validateJson($json)) {
+            if (!$jsonManager->validateJson($json)) {
                 continue;
             }
 

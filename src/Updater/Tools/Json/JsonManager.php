@@ -12,6 +12,7 @@
 namespace Updater\Tools\Json;
 
 use Seld\JsonLint\JsonParser;
+use JsonSchema\Validator;
 
 /**
  * Service to work with JSON
@@ -20,7 +21,7 @@ use Seld\JsonLint\JsonParser;
  */
 class JsonManager
 {
-    public static function getJsonFromFile($fileName, $pathName)
+    public function getJsonFromFile($fileName, $pathName)
     {
         $zip = new \ZipArchive();
         $zip->open($pathName);
@@ -42,10 +43,27 @@ class JsonManager
         return $json;
     }
 
-    public static function validateJson($json)
+    public function validateJson($json)
     {
         $parser = new JsonParser();
 
-        return null === $parser->lint($json);
+        $lintResult = $parser->lint($json);
+        if (null === $lintResult) {
+            return true;
+        }
+
+        return $lintResult;
+    }
+
+    public function validateSchema($json, $schema)
+    {
+        $validator = new Validator();
+        $validator->check(json_decode($json), json_decode($schema));
+
+        if ($validator->isValid()) {
+            return true;
+        } else {
+            return $validator->getErrors();
+        }
     }
 }

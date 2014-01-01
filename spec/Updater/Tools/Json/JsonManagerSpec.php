@@ -8,7 +8,7 @@ use Prophecy\Argument;
 class JsonManagerSpec extends ObjectBehavior
 {
     private $packagesDir;
-    
+
     function let()
     {
         $this->packagesDir = __DIR__ . '/../../../packages/';
@@ -28,5 +28,13 @@ class JsonManagerSpec extends ObjectBehavior
     {
         $json = $this->getJsonFromFile('update.json', realpath($this->packagesDir.'update-4.3.1.zip'));
         $this->validateJson($json->getWrappedObject())->shouldReturn(true);
+    }
+
+    function it_gives_valid_schema()
+    {
+        $json = $this->getJsonFromFile('update.json', realpath($this->packagesDir.'update-4.3.1.zip'));
+        $schema = file_get_contents(realpath(__DIR__ . '/../../../../schema/') . '/updater-schema.json');
+
+        $this->validateSchema($json, $schema)->shouldReturn(true);
     }
 }
