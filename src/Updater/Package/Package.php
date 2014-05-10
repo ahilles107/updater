@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Updater;
+namespace Updater\Package;
 
 /**
  * Update informations represented as a class
@@ -43,22 +43,16 @@ class Package
     private $changelog;
 
     /**
-     * Name of package mainatainer
+     * Name of package maintainer
      * @var string
      */
-    private $mainatiner;
+    private $maintainer;
 
     /**
      * Array with files mapping
      * @var array
      */
     private $filemapping;
-
-    /**
-     * Path for mapped files inside zip file
-     * @var string
-     */
-    private $filesDir;
 
     /**
      * Path for directory with migrations
@@ -173,21 +167,21 @@ class Package
      *
      * @return string
      */
-    public function getMainatiner()
+    public function getMaintainer()
     {
-        return $this->mainatiner;
+        return $this->maintainer;
     }
 
     /**
      * Sets the Name of package mainatainer.
      *
-     * @param string $mainatiner the mainatiner
+     * @param string $maintainer the maintainer
      *
      * @return self
      */
-    public function setMainatiner($mainatiner)
+    public function setMaintainer($maintainer)
     {
-        $this->mainatiner = $mainatiner;
+        $this->maintainer = $maintainer;
 
         return $this;
     }
@@ -211,31 +205,37 @@ class Package
      */
     public function setFilemapping(array $filemapping)
     {
-        $this->filemapping = $filemapping;
+        foreach ($filemapping as $file) {
+            $fileDefinition = explode(' ', $file);
+
+            if ($fileDefinition[0] == 'A') {
+                $type = 'add';
+            } elseif ($fileDefinition[0] == 'R') {
+                $type = 'remove';
+            } elseif ($fileDefinition[0] == 'M') {
+                $type = 'update';
+            }
+
+            $this->addFileToFileMapping($type, $fileDefinition[1]);
+        }
 
         return $this;
     }
 
     /**
-     * Gets the Path for mapped files inside zip file.
+     * Add new file to filemapping
      *
-     * @return string
-     */
-    public function getFilesDir()
-    {
-        return $this->filesDir;
-    }
-
-    /**
-     * Sets the Path for mapped files inside zip file.
-     *
-     * @param string $filesDir the files dir
+     * @param string $type
+     * @param string $file
      *
      * @return self
      */
-    public function setFilesDir($filesDir)
+    public function addFileToFileMapping($type, $file)
     {
-        $this->filesDir = $filesDir;
+        $this->filemapping[] = array(
+            'type' => $type,
+            'file' => $file
+        );
 
         return $this;
     }

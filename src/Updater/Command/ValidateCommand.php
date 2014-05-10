@@ -82,7 +82,7 @@ EOT
         $packageSpec = json_decode($json, true);
         $output->writeln('<info>Package version:</info>        '.$packageSpec['version']);
         $output->writeln('<info>Package description:</info>    '.$packageSpec['description']);
-        $output->writeln('<info>Package mainatiner:</info>     '.$packageSpec['mainatiner']);
+        $output->writeln('<info>Package maintainer:</info>     '.$packageSpec['maintainer']);
         $output->writeln('<info>Package changelog:</info>      '.implode(', ', $packageSpec['changelog']));
 
         $output->writeln('<info>* All valid!</info>');

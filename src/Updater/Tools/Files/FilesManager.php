@@ -24,7 +24,7 @@ class FilesManager
      * Get packages dir and file name to get update.json content in array
      *
      * @param string $packagesDir Directory with update packages
-     * @param [type] $zipFileName Update package file name
+     * @param string $zipFileName Update package file name
      *
      * @return array              Array witgh update packages definitions
      */
@@ -39,7 +39,7 @@ class FilesManager
             }
 
             if (!extension_loaded('zip')) {
-                throw new Exception("You need to have zip extension enabled");
+                throw new \Exception("You need to have zip extension enabled");
             }
 
             if ($zipFileName != null) {
