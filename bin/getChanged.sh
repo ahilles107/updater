@@ -40,10 +40,6 @@ while getopts ":hc:t:" opt; do
       ;;
     t)
       PATHPREFIX=$OPTARG
-      if [ ! -d "$PATHPREFIX" ]; then
-          echo "The specified target does not exist: $PATHPREFIX"
-          exit 1
-      fi
       ;;
     h)
       echo -e "$USAGE"
@@ -60,7 +56,13 @@ while getopts ":hc:t:" opt; do
   esac
 done
 
+if [ ! -d "$PATHPREFIX" ]; then
+    echo "The specified target does not exist: $PATHPREFIX"
+    exit 1
+fi
+
 if [ -n "$COMMIT" ]; then
+echo -e "\nCreating $COMMIT.zip and $COMMIT.txt in $PATHPREFIX\n"
 git archive --format zip -o $PATHPREFIX$COMMIT.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. --)
 git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- >> $PATHPREFIX$COMMIT.txt
 else
