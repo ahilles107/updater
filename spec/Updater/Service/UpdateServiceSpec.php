@@ -3,7 +3,6 @@
 namespace spec\Updater\Service;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Updater\Updater;
 use Updater\Package\Package;
 use Updater\Service\PackageService;
@@ -12,7 +11,7 @@ class UpdateServiceSpec extends ObjectBehavior
 {
     private $packagesDir;
 
-    function let($die)
+    public function let($die)
     {
         $updater = new Updater();
         $updater->setPackageService(new PackageService())
@@ -27,23 +26,23 @@ class UpdateServiceSpec extends ObjectBehavior
         $this->setPackage($package);
     }
 
-    function it_is_initializable(Updater $updater)
+    public function it_is_initializable(Updater $updater)
     {
         $this->shouldHaveType('Updater\Service\UpdateService');
     }
 
-    function it_copy_files_to_temp()
+    public function it_copy_files_to_temp()
     {
         $this->copyFilesToTemp()->shouldReturn(true);
     }
 
-    function it_should_apply_file_changes()
+    public function it_should_apply_file_changes()
     {
         $file = realpath(__DIR__ . '/../../../spec/packages').'/update-4.3.1.zip';
         $this->applyFileChanges($file)->shouldReturn(true);
     }
 
-    function it_should_rollback_file_changes()
+    public function it_should_rollback_file_changes()
     {
         $this->rollbackUpdate()->shouldReturn(true);
     }

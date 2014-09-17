@@ -18,6 +18,7 @@ use JsonSchema\Validator;
  * Service to work with JSON
  *
  * @author Paweł Mikołajczuk <mikolajczuk.private@gmail.com>
+ * @author Rafał Muszyński <rafal.muszynski@sourcefabric.org>
  */
 class JsonManager
 {
@@ -65,5 +66,28 @@ class JsonManager
         } else {
             return $validator->getErrors();
         }
+    }
+
+    /**
+     * Adds upgrade json file to zip package as upgrade-diff.json
+     *
+     * @param string $filePath Path to json file that will be added to archive
+     * @param string $zipPath  Zip file path, to which json file will be added
+     *
+     * @return boolean
+     */
+    public function addJsonToFile($filePath, $zipPath)
+    {
+        $zip = new \ZipArchive();
+        $zip->open($zipPath);
+
+        if (0 == $zip->numFiles) {
+            return false;
+        }
+
+        $zip->addFile($filePath, 'upgrade-diff.json');
+        $zip->close();
+
+        return true;
     }
 }
