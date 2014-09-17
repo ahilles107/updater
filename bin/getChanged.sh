@@ -32,6 +32,8 @@ while getopts ":hc:t:s:" opt; do
       ;;
     c)
       COMMIT=$OPTARG
+      FILE=$PATHPREFIX$COMMIT.txt
+      [[ -f "$FILE" ]] && rm -f "$FILE"
       if [ ! -d "$SOURCEPATH" ]; then
           echo "The specified source does not exist: $SOURCEPATH"
           exit 1

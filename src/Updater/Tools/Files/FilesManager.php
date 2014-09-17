@@ -13,6 +13,7 @@ namespace Updater\Tools\Files;
 
 use Updater\Tools\Json\JsonManager;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Service to work with package files
@@ -22,6 +23,9 @@ use Symfony\Component\Finder\Finder;
  */
 class FilesManager
 {
+    /**
+     * File with diffrences between commits name
+     */
     const DIFFFILENAME = 'upgrade-diff.json';
 
     /**
@@ -68,9 +72,20 @@ class FilesManager
         return $packages;
     }
 
-    public function createJsonFileFromSchema($schemaPath, $reference, $targetPath)
+    /**
+     * Creates JSON file from schema
+     *
+     * @param string $schemaPath Schema path
+     * @param string $reference  Commit or TAG
+     * @param string $targetPath Target path where zip package will be generated
+     * @param array  $exclude    Array with files or dirs to exclude from update package
+     *
+     * @return boolean
+     */
+    public function createJsonFileFromSchema($schemaPath, $reference, $targetPath, $exclude = array())
     {
         $jsonManager = new JsonManager();
+        $fs = new Filesystem();
         $schema = file_get_contents($schemaPath);
         $validationResult = $jsonManager->validateJson($schema);
 
@@ -80,19 +95,32 @@ class FilesManager
 
         $decodedSchema = json_decode($schema, true);
         $fileMapping = $this->findDiffFile($reference, $targetPath);
+
+        if (!empty($exclude)) {
+            $fileMapping = $this->exclude($fileMapping, $exclude);
+        }
+
         $decodedSchema['filemapping'] = $fileMapping;
-
         $filePath = realpath($targetPath) . '/' . self::DIFFFILENAME;
-        file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0));
+        file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0), LOCK_EX);
         $zipPath = realpath($targetPath . $reference . '.zip');
-
         if ($jsonManager->addJsonToFile($filePath, $zipPath)) {
+            $fs->remove(array($filePath));
+
             return true;
         }
 
         return false;
     }
 
+    /**
+     * Find diffrences txt file and converts it array
+     *
+     * @param string $reference  Commit or TAG
+     * @param string $targetPath Target path where txt file is located
+     *
+     * @return array Each line is array value
+     */
     public function findDiffFile($reference, $targetPath)
     {
         $finder = new Finder();
@@ -104,5 +132,27 @@ class FilesManager
         }
 
         return array_filter(preg_split('/\r\n|\n|\r/', $contents));
+    }
+
+    /**
+     * Exclude files or directories from update package
+     *
+     * @param array $fileMapping Array from which files or dirs will be exluded
+     * @param array $excludes    Array with values to exclude
+     *
+     * @return array Array with excludes dirs and files
+     */
+    public function exclude(array $fileMapping, array $excludes)
+    {
+        $result = array();
+        foreach ($excludes as $value) {
+            $result = array_filter($fileMapping, function ($element) use ($value) {
+                return (strpos($element, $value) === false);
+            });
+
+            $fileMapping = $result;
+        }
+
+        return $fileMapping;
     }
 }

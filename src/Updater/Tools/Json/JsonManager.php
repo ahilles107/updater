@@ -13,6 +13,7 @@ namespace Updater\Tools\Json;
 
 use Seld\JsonLint\JsonParser;
 use JsonSchema\Validator;
+use Updater\Tools\Files\FilesManager;
 
 /**
  * Service to work with JSON
@@ -89,7 +90,7 @@ class JsonManager
             return false;
         }
 
-        $zip->addFile($filePath, 'upgrade-diff.json');
+        $zip->addFile($filePath, FilesManager::DIFFFILENAME);
         $zip->close();
 
         return true;

@@ -36,7 +36,24 @@ class FilesManagerSpec extends ObjectBehavior
 
     public function it_finds_generated_txt_diff_file()
     {
-
         $this->findDiffFile($this->reference, $this->packagesDir)->shouldBeArray();
+    }
+
+    public function it_exclude_dirs_from_diff_array()
+    {
+        $fileMapping = array(
+            'A  bin/getChanged.sh',
+            'A  bin/jsonlint',
+            'A  bin/phpunit',
+            'M  schema/updater-schema.json',
+            'D  install/'
+        );
+
+        $excludes = array(
+            'schema/updater-schema.json',
+            'install/',
+        );
+
+        $this->exclude($fileMapping, $excludes)->shouldBeArray();
     }
 }

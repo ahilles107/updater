@@ -39,6 +39,11 @@ class GeneratePackageCommand extends Command
      */
     private $scriptsDir =  '/../../../bin/';
 
+    /**
+     * Schema file path
+     *
+     * @var string
+     */
     private $schemaPath = '/../../../schema/updater-schema.json';
 
     /**
@@ -52,13 +57,14 @@ class GeneratePackageCommand extends Command
             ->setDefinition(array(
                 new InputArgument('reference', InputArgument::REQUIRED, 'COMMIT or TAG'),
                 new InputArgument('source', InputArgument::OPTIONAL, 'the source directory, defaults to current directory'),
-                new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\'')
+                new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
+                new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package')
             ))
             ->setHelp(
 <<<EOT
 This command allows you to create an update package in the target directory from given source
 based on the differences in a git repository between the current state and a
-specific git tree-ish.
+specific git tree-ish. You can also exclude files and/or directories from update package.
 
 EOT
             );
@@ -69,10 +75,15 @@ EOT
         $reference = $input->getArgument('reference');
         $targetDir = $input->getArgument('target');
         $sourceDir = $input->getArgument('source');
+        $exclude = $input->getArgument('exclude');
         $filesManager = new FilesManager();
 
         if (!$targetDir) {
             $targetDir = realpath(__DIR__ . $this->target) . '/';
+        }
+
+        if (is_null($exclude) || empty($exclude)) {
+            $exclude = array();
         }
 
         if (!file_exists($targetDir)) {
@@ -107,7 +118,7 @@ EOT
             throw new \RuntimeException($process->getErrorOutput());
         }
 
-        if ($filesManager->createJsonFileFromSchema(realpath(__DIR__ . $this->schemaPath), $reference, $targetDir)) {
+        if ($filesManager->createJsonFileFromSchema(realpath(__DIR__ . $this->schemaPath), $reference, $targetDir, $exclude)) {
             return true;
         }
 
