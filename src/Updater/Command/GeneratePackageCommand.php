@@ -21,12 +21,25 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Process\Process;
+use Updater\Tools\Files\FilesManager;
 
 class GeneratePackageCommand extends Command
 {
+    /**
+     * Target path, where package will be generated to
+     *
+     * @var string
+     */
     private $target =  '/../../../packages/';
 
+    /**
+     * Bash scripts directory
+     *
+     * @var string
+     */
     private $scriptsDir =  '/../../../bin/';
+
+    private $schemaPath = '/../../../schema/updater-schema.json';
 
     /**
      * Configure console command
@@ -56,6 +69,7 @@ EOT
         $reference = $input->getArgument('reference');
         $targetDir = $input->getArgument('target');
         $sourceDir = $input->getArgument('source');
+        $filesManager = new FilesManager();
 
         if (!$targetDir) {
             $targetDir = realpath(__DIR__ . $this->target) . '/';
@@ -93,6 +107,10 @@ EOT
             throw new \RuntimeException($process->getErrorOutput());
         }
 
-        return true;
+        if ($filesManager->createJsonFileFromSchema(realpath(__DIR__ . $this->schemaPath), $reference, $targetDir)) {
+            return true;
+        }
+
+        return false;
     }
 }

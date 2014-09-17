@@ -6,7 +6,7 @@
         "Fix typo in readme file",
         "Improve speed of application"
     ],
-    "mainatiner": "Paweł Mikołajczuk <mikolajczuk.private@gmail.com",
+    "maintainer": "Paweł Mikołajczuk <mikolajczuk.private@gmail.com",
     "scripts":{
         "pre-update-cmd":[
             "MyVendor\\Application\\Tools\\Command::preUpdate"

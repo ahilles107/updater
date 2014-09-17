@@ -78,6 +78,10 @@ class JsonManager
      */
     public function addJsonToFile($filePath, $zipPath)
     {
+        if (!extension_loaded('zip')) {
+            throw new \Exception("You need to have zip extension enabled");
+        }
+
         $zip = new \ZipArchive();
         $zip->open($zipPath);
 
