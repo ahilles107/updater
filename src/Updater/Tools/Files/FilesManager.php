@@ -82,7 +82,7 @@ class FilesManager
         $fileMapping = $this->findDiffFile($reference, $targetPath);
         $decodedSchema['filemapping'] = $fileMapping;
 
-        $filePath = realpath($targetPath . self::DIFFFILENAME);
+        $filePath = realpath($targetPath) . '/' . self::DIFFFILENAME;
         file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0));
         $zipPath = realpath($targetPath . $reference . '.zip');
 
