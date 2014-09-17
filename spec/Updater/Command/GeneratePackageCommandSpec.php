@@ -19,8 +19,8 @@ class GeneratePackageCommandSpec extends ObjectBehavior
     {
         $input = new ArrayInput(
             array(
-                'reference' => 'cc58654e857668108bfc926e1c8fbc9fd1013e02',
-                'source' => __DIR__ . '/../../sample_app',
+                'reference' => '89144ee17ce72370766e21d1a767fdbed0a9e8b7',
+                'source' => __DIR__ . '/../../../../updater',
                 'target' => __DIR__ . '/../../packages/'
             ),
             new InputDefinition(array(
