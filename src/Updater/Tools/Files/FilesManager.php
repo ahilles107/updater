@@ -12,21 +12,29 @@
 namespace Updater\Tools\Files;
 
 use Updater\Tools\Json\JsonManager;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Service to work with package files
  *
  * @author Paweł Mikołajczuk <mikolajczuk.private@gmail.com>
+ * @author Rafał Muszyński <rafal.muszynski@sourcefabric.org>
  */
 class FilesManager
 {
+    /**
+     * File with diffrences between commits name
+     */
+    const DIFFFILENAME = 'upgrade-diff.json';
+
     /**
      * Get packages dir and file name to get update.json content in array
      *
      * @param string $packagesDir Directory with update packages
      * @param string $zipFileName Update package file name
      *
-     * @return array              Array witgh update packages definitions
+     * @return array Array witgh update packages definitions
      */
     public function getSpecFromZip($packagesDir, $zipFileName = null)
     {
@@ -54,7 +62,6 @@ class FilesManager
                 continue;
             }
 
-
             if (!$jsonManager->validateJson($json)) {
                 continue;
             }
@@ -63,5 +70,95 @@ class FilesManager
         }
 
         return $packages;
+    }
+
+    /**
+     * Creates JSON file from schema
+     *
+     * @param string $schemaPath Schema path
+     * @param array  $arguments  Array of arguments
+     *
+     * @return boolean
+     */
+    public function createJsonFileFromSchema($schemaPath, $arguments)
+    {
+        $jsonManager = new JsonManager();
+        $fs = new Filesystem();
+        $schema = file_get_contents($schemaPath);
+        $validationResult = $jsonManager->validateJson($schema);
+
+        if (true !== $validationResult) {
+            throw new \Exception('JSON schema is not valid', 1);
+        }
+
+        $decodedSchema = json_decode($schema, true);
+        $fileMapping = $this->getFileContent($arguments['reference'] . '.txt', $arguments['target']);
+
+        if (!empty($arguments['exclude'])) {
+            $fileMapping = $this->exclude($fileMapping, $arguments['exclude']);
+        }
+
+        $decodedSchema['changelog'] = $this->getFileContent($arguments['reference'] . '_commits.txt', $arguments['target']);
+        $decodedSchema['filemapping'] = $fileMapping;
+
+        foreach ($decodedSchema as $key => $value) {
+            if (array_key_exists($key, $arguments)) {
+                $decodedSchema[$key] = $arguments[$key];
+            }
+        }
+
+        $filePath = realpath($arguments['target']) . '/' . self::DIFFFILENAME;
+        file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0), LOCK_EX);
+        $zipPath = realpath($arguments['target'] . $arguments['reference'] . '.zip');
+        if ($jsonManager->addJsonToFile($filePath, $zipPath)) {
+            $fs->remove(array($filePath));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Finds file by given name and given directory then converts it to array
+     *
+     * @param string $reference  Commit or TAG
+     * @param string $targetPath Target path where txt file is located
+     *
+     * @return array Each line is array value
+     */
+    public function getFileContent($reference, $targetPath)
+    {
+        $finder = new Finder();
+        $finder->files()->name($reference);
+
+        $contents = null;
+        foreach ($finder->in($targetPath) as $file) {
+            $contents = $file->getContents();
+        }
+
+        return array_filter(preg_split('/\r\n|\n|\r/', $contents));
+    }
+
+    /**
+     * Exclude files or directories from update package
+     *
+     * @param array $fileMapping Array from which files or dirs will be exluded
+     * @param array $excludes    Array with values to exclude
+     *
+     * @return array Array with excludes dirs and files
+     */
+    public function exclude(array $fileMapping, array $excludes)
+    {
+        $result = array();
+        foreach ($excludes as $value) {
+            $result = array_filter($fileMapping, function ($element) use ($value) {
+                return (strpos($element, $value) === false);
+            });
+
+            $fileMapping = $result;
+        }
+
+        return $fileMapping;
     }
 }

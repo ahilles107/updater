@@ -12,7 +12,6 @@
 namespace Updater\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\Input\InputInterface;
 use Updater\Command;
 
 /**
@@ -51,6 +50,7 @@ class Application extends BaseApplication
     {
         $commands = parent::getDefaultCommands();
         $commands[] = new Command\ValidateCommand();
+        $commands[] = new Command\GeneratePackageCommand();
 
         return $commands;
     }

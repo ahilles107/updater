@@ -6,23 +6,12 @@
         "Fix typo in readme file",
         "Improve speed of application"
     ],
-    "mainatiner": "Paweł Mikołajczuk <mikolajczuk.private@gmail.com",
-    "scripts":{
-        "pre-update-cmd":[
-            "MyVendor\\Application\\Tools\\Command::preUpdate"
-        ],
-        "post-update-cmd":[
-            "MyVendor\\Application\\Tools\\Command::postUpdate"
-        ]
-    },
+    "maintainer": "Paweł Mikołajczuk <mikolajczuk.private@gmail.com",
     "filemapping": [
         "+ README.md",
         "+ Version.php",
         "+ composer.json",
         "+ composer.lock",
         "- src/Vendor/Library/UnwantedFile.php"
-    ],
-    "files-dir": "files/",
-    "migrations-dir": "migrations/",
-    "composer-action": "install"
+    ]
 }
