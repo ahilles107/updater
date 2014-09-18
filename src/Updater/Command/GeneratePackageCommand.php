@@ -56,6 +56,10 @@ class GeneratePackageCommand extends Command
             ->setDescription('Generates update package')
             ->setDefinition(array(
                 new InputArgument('reference', InputArgument::REQUIRED, 'COMMIT or TAG'),
+                new InputArgument('version', InputArgument::REQUIRED, 'Release version'),
+                new InputArgument('description', InputArgument::REQUIRED, 'Release description'),
+                new InputArgument('maintainer', InputArgument::REQUIRED, 'Package mainatainer'),
+                new InputArgument('update-type', InputArgument::REQUIRED, 'Update package type (e.g. minor, critical etc.'),
                 new InputArgument('source', InputArgument::OPTIONAL, 'the source directory, defaults to current directory'),
                 new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
                 new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package')
@@ -72,39 +76,39 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $reference = $input->getArgument('reference');
-        $targetDir = $input->getArgument('target');
-        $sourceDir = $input->getArgument('source');
-        $exclude = $input->getArgument('exclude');
+        $arguments = $input->getArguments();
         $filesManager = new FilesManager();
 
-        if (!$targetDir) {
-            $targetDir = realpath(__DIR__ . $this->target) . '/';
+        if (empty($arguments['target'])) {
+            $arguments['target'] = realpath(__DIR__ . $this->target) . '/';
         }
 
-        if (is_null($exclude) || empty($exclude)) {
-            $exclude = array();
+        if (isset($arguments['exclude']) && empty($arguments['exclude'])) {
+            $arguments['exclude'] = array();
         }
 
-        if (!file_exists($targetDir)) {
-            throw new \Exception($targetDir . ' not found.', 1);
+        if (!file_exists($arguments['target'])) {
+            throw new \Exception($arguments['target'] . ' not found.', 1);
         }
 
-        if (!is_writable($targetDir)) {
-            throw new \Exception($targetDir . ' is not writable.', 1);
+        if (!is_writable($arguments['target'])) {
+            throw new \Exception($arguments['target'] . ' is not writable.', 1);
         }
 
         $commandLine = 'bash ' . realpath(__DIR__ . $this->scriptsDir) . '/getChanged.sh';
-        if ($sourceDir) {
-            $commandLine .= ' -s ' . $sourceDir;
+        if (isset($arguments['source']) && !empty($arguments['source'])) {
+            $commandLine .= ' -s ' . $arguments['source'];
         }
 
-        if ($targetDir) {
-            $commandLine .= ' -t ' . $targetDir;
+        if (isset($arguments['target']) && !empty($arguments['target'])) {
+            $commandLine .= ' -t ' . $arguments['target'];
         }
 
-        $commandLine .= ' -c ' . $reference;
+        if (!empty($arguments['exclude'])) {
+            $commandLine .= ' -e ' . '"' . implode('|', $arguments['exclude']) . '"';
+        }
 
+        $commandLine .= ' -c ' . $arguments['reference'];
         $process = new Process($commandLine);
         $process->run(function ($type, $buffer) use ($output) {
             if (Process::ERR === $type) {
@@ -118,7 +122,7 @@ EOT
             throw new \RuntimeException($process->getErrorOutput());
         }
 
-        if ($filesManager->createJsonFileFromSchema(realpath(__DIR__ . $this->schemaPath), $reference, $targetDir, $exclude)) {
+        if ($filesManager->createJsonFileFromSchema(realpath(__DIR__ . $this->schemaPath), $arguments)) {
             return true;
         }
 

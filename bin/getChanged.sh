@@ -20,20 +20,24 @@ REQUIRED\n \
 OPTIONAL\n \
 \t-s\tthe source directory, defaults to current directory\n \
 \t-t\tthe target directory, defaults to '$PATHPREFIX'\n \
+\t-e\texclude directories or/and files from package\n \
 \t-h\tthis usage description\
 \n \
 \n\
 Copyright 2014 Sourcefabric z.ú. written by $AUTHOR"
 
-while getopts ":hc:t:s:" opt; do
+while getopts ":hc:t:s:e:" opt; do
   case $opt in
     s)
       SOURCEPATH=$OPTARG
       ;;
     c)
       COMMIT=$OPTARG
+      SLUG="_commits"
       FILE=$PATHPREFIX$COMMIT.txt
+      COMMITSFILE=$PATHPREFIX$COMMIT$SLUG.txt
       [[ -f "$FILE" ]] && rm -f "$FILE"
+      [[ -f "$COMMITSFILE" ]] && rm -f "$COMMITSFILE"
       if [ ! -d "$SOURCEPATH" ]; then
           echo "The specified source does not exist: $SOURCEPATH"
           exit 1
@@ -52,6 +56,9 @@ while getopts ":hc:t:s:" opt; do
       ;;
     t)
       PATHPREFIX=$OPTARG
+      ;;
+    e)
+      EXCLUDE=$OPTARG
       ;;
     h)
       echo -e "$USAGE"
@@ -76,8 +83,15 @@ fi
 if [ -n "$COMMIT" ]; then
 echo -e "\nCreating $COMMIT.zip and $COMMIT.txt in $PATHPREFIX\n"
 cd $SOURCEPATH
-git archive --format zip -o $PATHPREFIX$COMMIT.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. --)
-git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- >> $PATHPREFIX$COMMIT.txt
+  if [ -z "$EXCLUDE" ]
+    then
+      git archive --format zip -o $PATHPREFIX$COMMIT.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. --)
+      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- >> $PATHPREFIX$COMMIT.txt
+    else
+      git archive --format zip -o $PATHPREFIX$COMMIT.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE")
+      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE" >> $PATHPREFIX$COMMIT.txt
+  fi
+  git log --oneline $COMMIT..HEAD --no-merges >> $PATHPREFIX$COMMIT$SLUG.txt
 else
     echo -e "$USAGE"
 fi

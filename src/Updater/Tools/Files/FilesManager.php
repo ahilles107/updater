@@ -76,13 +76,11 @@ class FilesManager
      * Creates JSON file from schema
      *
      * @param string $schemaPath Schema path
-     * @param string $reference  Commit or TAG
-     * @param string $targetPath Target path where zip package will be generated
-     * @param array  $exclude    Array with files or dirs to exclude from update package
+     * @param array  $arguments  Array of arguments
      *
      * @return boolean
      */
-    public function createJsonFileFromSchema($schemaPath, $reference, $targetPath, $exclude = array())
+    public function createJsonFileFromSchema($schemaPath, $arguments)
     {
         $jsonManager = new JsonManager();
         $fs = new Filesystem();
@@ -94,16 +92,24 @@ class FilesManager
         }
 
         $decodedSchema = json_decode($schema, true);
-        $fileMapping = $this->findDiffFile($reference, $targetPath);
+        $fileMapping = $this->getFileContent($arguments['reference'] . '.txt', $arguments['target']);
 
-        if (!empty($exclude)) {
-            $fileMapping = $this->exclude($fileMapping, $exclude);
+        if (!empty($arguments['exclude'])) {
+            $fileMapping = $this->exclude($fileMapping, $arguments['exclude']);
         }
 
+        $decodedSchema['changelog'] = $this->getFileContent($arguments['reference'] . '_commits.txt', $arguments['target']);
         $decodedSchema['filemapping'] = $fileMapping;
-        $filePath = realpath($targetPath) . '/' . self::DIFFFILENAME;
+
+        foreach ($decodedSchema as $key => $value) {
+            if (array_key_exists($key, $arguments)) {
+                $decodedSchema[$key] = $arguments[$key];
+            }
+        }
+
+        $filePath = realpath($arguments['target']) . '/' . self::DIFFFILENAME;
         file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0), LOCK_EX);
-        $zipPath = realpath($targetPath . $reference . '.zip');
+        $zipPath = realpath($arguments['target'] . $arguments['reference'] . '.zip');
         if ($jsonManager->addJsonToFile($filePath, $zipPath)) {
             $fs->remove(array($filePath));
 
@@ -114,17 +120,17 @@ class FilesManager
     }
 
     /**
-     * Find diffrences txt file and converts it array
+     * Finds file by given name and given directory then converts it to array
      *
      * @param string $reference  Commit or TAG
      * @param string $targetPath Target path where txt file is located
      *
      * @return array Each line is array value
      */
-    public function findDiffFile($reference, $targetPath)
+    public function getFileContent($reference, $targetPath)
     {
         $finder = new Finder();
-        $finder->files()->name($reference . '.txt');
+        $finder->files()->name($reference);
 
         $contents = null;
         foreach ($finder->in($targetPath) as $file) {

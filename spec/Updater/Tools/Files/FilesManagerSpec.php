@@ -31,12 +31,25 @@ class FilesManagerSpec extends ObjectBehavior
 
     public function it_creates_json_file_from_schema()
     {
-        $this->createJsonFileFromSchema($this->schemaFile, $this->reference, $this->packagesDir)->shouldReturn(true);
+        $arguments = array(
+            'reference' => $this->reference,
+            'target' => $this->packagesDir,
+            'version' => '4.3.1-RC',
+            'description' => 'This is test package description',
+            'maintainer' => 'Jhon Doe',
+            'update-type' => 'security-bugfix',
+            'exclude' => array(
+                'schema/updater-schema.json',
+                'bin/phpunit',
+            )
+        );
+
+        $this->createJsonFileFromSchema($this->schemaFile, $arguments)->shouldReturn(true);
     }
 
-    public function it_finds_generated_txt_diff_file()
+    public function it_gets_file_content_to_array()
     {
-        $this->findDiffFile($this->reference, $this->packagesDir)->shouldBeArray();
+        $this->getFileContent($this->reference, $this->packagesDir)->shouldBeArray();
     }
 
     public function it_exclude_dirs_from_diff_array()
@@ -51,7 +64,7 @@ class FilesManagerSpec extends ObjectBehavior
 
         $excludes = array(
             'schema/updater-schema.json',
-            'install/',
+            'bin/phpunit',
         );
 
         $this->exclude($fileMapping, $excludes)->shouldBeArray();
