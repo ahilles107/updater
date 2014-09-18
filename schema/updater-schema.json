@@ -7,22 +7,11 @@
         "Improve speed of application"
     ],
     "maintainer": "Paweł Mikołajczuk <mikolajczuk.private@gmail.com",
-    "scripts":{
-        "pre-update-cmd":[
-            "MyVendor\\Application\\Tools\\Command::preUpdate"
-        ],
-        "post-update-cmd":[
-            "MyVendor\\Application\\Tools\\Command::postUpdate"
-        ]
-    },
     "filemapping": [
         "+ README.md",
         "+ Version.php",
         "+ composer.json",
         "+ composer.lock",
         "- src/Vendor/Library/UnwantedFile.php"
-    ],
-    "files-dir": "files/",
-    "migrations-dir": "migrations/",
-    "composer-action": "install"
+    ]
 }
