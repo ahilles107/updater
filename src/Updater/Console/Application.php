@@ -51,6 +51,7 @@ class Application extends BaseApplication
         $commands = parent::getDefaultCommands();
         $commands[] = new Command\ValidateCommand();
         $commands[] = new Command\GeneratePackageCommand();
+        $commands[] = new Command\UpdateCommand();
 
         return $commands;
     }

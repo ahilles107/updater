@@ -24,9 +24,7 @@ class PackageService
             ->setUpdateType($update['update-type'])
             ->setChangelog($update['changelog'])
             ->setMaintainer($update['maintainer'])
-            ->setFilemapping($update['filemapping'])
-            ->setMigrationsDir($update['migrations-dir'])
-            ->setComposerAction($update['composer-action']);
+            ->setFilemapping($update['filemapping']);
 
         return $package;
     }

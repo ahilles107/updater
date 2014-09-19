@@ -12,7 +12,6 @@
 namespace Updater\Service;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Updater\Updater;
 use Updater\Package\Package;
 
@@ -40,9 +39,13 @@ class UpdateService
         $this->copyFilesToTemp();
 
         try {
-            $this->applyFileChanges();
+            $this->applyFileChanges($package->getPackageDir());
+
+            return true;
         } catch (\Exception $e) {
-            $this->rollbackUpdate($package);
+            $this->rollbackUpdate();
+
+            return false;
         }
     }
 
@@ -74,7 +77,7 @@ class UpdateService
             if ($fs->exists($this->updater->getWorkingDir().'/'.$file['file']) && $file['type'] != 'add') {
                 $fs->copy($this->updater->getWorkingDir().'/'.$file['file'], $this->updater->getTempDir().'/oldfiles/'.$file['file']);
             } elseif (!$fs->exists($this->updater->getWorkingDir().'/'.$file['file']) && $file['type'] == 'update') {
-                throw new \Exception($this->updater->getWorkingDir().'/'.$file['file'] . " don't exists");
+                throw new \Exception($this->updater->getWorkingDir().'/'.$file['file'] . " doesn't exist.");
             }
         }
 
@@ -143,5 +146,10 @@ class UpdateService
         } else {
             throw new \Exception("Update file was not found!");
         }
+    }
+
+    public function getPackage()
+    {
+        return $this->package;
     }
 }

@@ -67,6 +67,12 @@ class Package
     private $composerAction;
 
     /**
+     * Package dir
+     * @var string
+     */
+    private $packageDir;
+
+    /**
      * Gets the Version name.
      *
      * @return string
@@ -206,17 +212,16 @@ class Package
     public function setFilemapping(array $filemapping)
     {
         foreach ($filemapping as $file) {
-            $fileDefinition = explode(' ', $file);
-
-            if ($fileDefinition[0] == 'A') {
+            $fileDefinition = substr($file, strpos($file, " ") + 1);
+            if ($file[0] == 'A') {
                 $type = 'add';
-            } elseif ($fileDefinition[0] == 'R') {
+            } elseif ($file[0] == 'R') {
                 $type = 'remove';
-            } elseif ($fileDefinition[0] == 'M') {
+            } elseif ($file[0] == 'M') {
                 $type = 'update';
             }
 
-            $this->addFileToFileMapping($type, $fileDefinition[1]);
+            $this->addFileToFileMapping($type, trim($fileDefinition));
         }
 
         return $this;
@@ -284,6 +289,30 @@ class Package
     public function setComposerAction($composerAction)
     {
         $this->composerAction = $composerAction;
+
+        return $this;
+    }
+
+    /**
+     * Gets the Package dir.
+     *
+     * @return string
+     */
+    public function getPackageDir()
+    {
+        return $this->packageDir;
+    }
+
+    /**
+     * Sets the Package dir.
+     *
+     * @param string $packageDir the package dir
+     *
+     * @return self
+     */
+    public function setPackageDir($packageDir)
+    {
+        $this->packageDir = $packageDir;
 
         return $this;
     }

@@ -70,7 +70,7 @@ class JsonManager
     }
 
     /**
-     * Adds upgrade json file to zip package as upgrade-diff.json
+     * Adds upgrade json file to zip package as update.json
      *
      * @param string $filePath Path to json file that will be added to archive
      * @param string $zipPath  Zip file path, to which json file will be added
