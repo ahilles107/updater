@@ -74,9 +74,16 @@ class UpdateService
 
         $fs->mkdir($this->updater->getTempDir().'/oldfiles/');
         foreach ($fileMapping as $file) {
-            if ($fs->exists($this->updater->getWorkingDir().'/'.$file['file']) && $file['type'] != 'add') {
-                $fs->copy($this->updater->getWorkingDir().'/'.$file['file'], $this->updater->getTempDir().'/oldfiles/'.$file['file']);
-            } elseif (!$fs->exists($this->updater->getWorkingDir().'/'.$file['file']) && $file['type'] == 'update') {
+            $exists = $fs->exists($this->updater->getWorkingDir().'/'.$file['file']);
+
+            if ($exists && $file['type'] != 'add') {
+                if (is_link($this->updater->getWorkingDir().'/'.$file['file'])) {
+                    $fs->symlink($this->updater->getWorkingDir().'/'.$file['file'], $this->updater->getTempDir().'/oldfiles/'.$file['file'], true);
+                } else {
+                    $fs->copy($this->updater->getWorkingDir().'/'.$file['file'], $this->updater->getTempDir().'/oldfiles/'.$file['file']);
+                }
+            } elseif (!$exists && $file['type'] == 'update') {
+
                 throw new \Exception($this->updater->getWorkingDir().'/'.$file['file'] . " doesn't exist.");
             }
         }

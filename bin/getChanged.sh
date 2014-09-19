@@ -83,9 +83,9 @@ if [ ! -d "$PATHPREFIX" ]; then
     echo "The specified target does not exist: $PATHPREFIX"
     exit 1
 fi
-echo $COMMIT
+
 if [ -n "$COMMIT" ]; then
-echo -e "\nCreating $PACKAGENAME.zip and $PACKAGENAME.txt in $PATHPREFIX\n"
+echo -e "\nCreating $PACKAGENAME.zip, $PACKAGENAME.txt and $PACKAGENAME$SLUG.txt in $PATHPREFIX\n"
 cd $SOURCEPATH
   if [ -z "$EXCLUDE" ]
     then

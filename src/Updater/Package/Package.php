@@ -213,9 +213,10 @@ class Package
     {
         foreach ($filemapping as $file) {
             $fileDefinition = substr($file, strpos($file, " ") + 1);
+            $type = null;
             if ($file[0] == 'A') {
                 $type = 'add';
-            } elseif ($file[0] == 'R') {
+            } elseif ($file[0] == 'D') {
                 $type = 'remove';
             } elseif ($file[0] == 'M') {
                 $type = 'update';
