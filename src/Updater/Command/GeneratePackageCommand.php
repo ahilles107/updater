@@ -95,7 +95,7 @@ EOT
             throw new \Exception($arguments['target'] . ' is not writable.', 1);
         }
 
-        $commandLine = 'bash ' . realpath(__DIR__ . $this->scriptsDir) . '/getChanged.sh';
+        $commandLine = 'bash ' . realpath(__DIR__ . $this->scriptsDir) . '/getChanged.sh -n "' . $arguments['version'] . '"';
         if (isset($arguments['source']) && !empty($arguments['source'])) {
             $commandLine .= ' -s ' . $arguments['source'];
         }

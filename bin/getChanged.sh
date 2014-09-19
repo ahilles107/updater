@@ -17,6 +17,7 @@ appropriate git repostitory.\n\
 \n \
 REQUIRED\n \
 \t-c\ta git-treeish (e.g. a COMMIT or TAG)\n\n \
+\t-n\ta package name (e.g. 4.3.1-RC)\n\n \
 OPTIONAL\n \
 \t-s\tthe source directory, defaults to current directory\n \
 \t-t\tthe target directory, defaults to '$PATHPREFIX'\n \
@@ -26,16 +27,19 @@ OPTIONAL\n \
 \n\
 Copyright 2014 Sourcefabric z.ú. written by $AUTHOR"
 
-while getopts ":hc:t:s:e:" opt; do
+while getopts ":hc:n:t:s:e:" opt; do
   case $opt in
+    n)
+      PACKAGENAME=$OPTARG
+      ;;
     s)
       SOURCEPATH=$OPTARG
       ;;
     c)
       COMMIT=$OPTARG
       SLUG="_commits"
-      FILE=$PATHPREFIX$COMMIT.txt
-      COMMITSFILE=$PATHPREFIX$COMMIT$SLUG.txt
+      FILE=$PATHPREFIX$PACKAGENAME.txt
+      COMMITSFILE=$PATHPREFIX$PACKAGENAME$SLUG.txt
       [[ -f "$FILE" ]] && rm -f "$FILE"
       [[ -f "$COMMITSFILE" ]] && rm -f "$COMMITSFILE"
       if [ ! -d "$SOURCEPATH" ]; then
@@ -79,19 +83,19 @@ if [ ! -d "$PATHPREFIX" ]; then
     echo "The specified target does not exist: $PATHPREFIX"
     exit 1
 fi
-
+echo $COMMIT
 if [ -n "$COMMIT" ]; then
-echo -e "\nCreating $COMMIT.zip and $COMMIT.txt in $PATHPREFIX\n"
+echo -e "\nCreating $PACKAGENAME.zip and $PACKAGENAME.txt in $PATHPREFIX\n"
 cd $SOURCEPATH
   if [ -z "$EXCLUDE" ]
     then
-      git archive --format zip -o $PATHPREFIX$COMMIT.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. --)
-      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- >> $PATHPREFIX$COMMIT.txt
+      git archive --format zip -o $PATHPREFIX$PACKAGENAME.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. --)
+      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- >> $PATHPREFIX$PACKAGENAME.txt
     else
-      git archive --format zip -o $PATHPREFIX$COMMIT.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE")
-      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE" >> $PATHPREFIX$COMMIT.txt
+      git archive --format zip -o $PATHPREFIX$PACKAGENAME.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE")
+      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE" >> $PATHPREFIX$PACKAGENAME.txt
   fi
-  git log --oneline $COMMIT..HEAD --no-merges >> $PATHPREFIX$COMMIT$SLUG.txt
+  git log --oneline $COMMIT..HEAD --no-merges >> $PATHPREFIX$PACKAGENAME$SLUG.txt
 else
     echo -e "$USAGE"
 fi
