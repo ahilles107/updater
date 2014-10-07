@@ -17,7 +17,21 @@ based on the differences in a git repository between the current state and a
 specific git tree-ish. You can also exclude files and/or directories from update package
 
 ```
-php bin/updater generate reference version description maintainer update-type [source] [target] [exclude1] ... [excludeN]
+php bin/updater generate reference version description maintainer update-type [source] [target] [comparePath] [exclude1] ... [excludeN]
+```
+
+```
+Arguments:
+
+ reference             COMMIT or TAG
+ version               Release version
+ description           Release description
+ maintainer            Package mainatainer
+ update-type           Update package type (e.g. minor, critical etc.
+ source                the source directory, defaults to current directory
+ target                the target directory, defaults to 'packages/'
+ comparePath           path in the repository from which you want to generate a package, defaults "./"
+ exclude               files or directories to exclude from package
 ```
 
 **Example:**
@@ -35,6 +49,12 @@ Validate package command:
 php bin/updater validate file
 ```
 
+```
+Arguments:
+
+ file                  path to update package
+```
+
 **Example:**
 
 ```
@@ -46,6 +66,14 @@ Update application command:
 
 ```
 php bin/updater update [--rollback] target temp_dir package_dir
+```
+
+```
+Arguments:
+
+ target                Your application directory you want to update
+ temp_dir              Directory to your application temp/cache folder
+ package_dir           Package real path (path to your zip package)
 ```
 
 **Example:**

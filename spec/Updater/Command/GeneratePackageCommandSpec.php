@@ -24,6 +24,7 @@ class GeneratePackageCommandSpec extends ObjectBehavior
                 'description' => 'This is test package description',
                 'maintainer' => 'Jhon Doe',
                 'update-type' => 'security-bugfix',
+                'comparePath' => 'src/',
                 'source' => __DIR__ . '/../../../../updater',
                 'target' => __DIR__ . '/../../packages/',
                 'exclude' => array(
@@ -39,6 +40,7 @@ class GeneratePackageCommandSpec extends ObjectBehavior
                 new InputArgument('update-type', InputArgument::REQUIRED, 'Update package type (e.g. minor, critical etc.'),
                 new InputArgument('source', InputArgument::OPTIONAL, 'the source directory, defaults to current directory'),
                 new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
+                new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"'),
                 new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package')
             ))
         );

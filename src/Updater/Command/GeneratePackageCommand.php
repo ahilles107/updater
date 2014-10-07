@@ -62,6 +62,7 @@ class GeneratePackageCommand extends Command
                 new InputArgument('update-type', InputArgument::REQUIRED, 'Update package type (e.g. minor, critical etc.'),
                 new InputArgument('source', InputArgument::OPTIONAL, 'the source directory, defaults to current directory'),
                 new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
+                new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"'),
                 new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package')
             ))
             ->setHelp(
@@ -96,6 +97,12 @@ EOT
         }
 
         $commandLine = 'bash ' . realpath(__DIR__ . $this->scriptsDir) . '/getChanged.sh -n "' . $arguments['version'] . '"';
+        if (isset($arguments['comparePath']) && !empty($arguments['comparePath'])) {
+            $commandLine .= ' -d ' . $arguments['comparePath'];
+        } else {
+            $commandLine .= ' -d ./';
+        }
+
         if (isset($arguments['source']) && !empty($arguments['source'])) {
             $commandLine .= ' -s ' . $arguments['source'];
         }

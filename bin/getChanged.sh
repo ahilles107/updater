@@ -18,6 +18,7 @@ appropriate git repostitory.\n\
 REQUIRED\n \
 \t-c\ta git-treeish (e.g. a COMMIT or TAG)\n\n \
 \t-n\ta package name (e.g. 4.3.1-RC)\n\n \
+\t-d\ta path to be compared (e.g. sample_app/src)\n\n \
 OPTIONAL\n \
 \t-s\tthe source directory, defaults to current directory\n \
 \t-t\tthe target directory, defaults to '$PATHPREFIX'\n \
@@ -27,7 +28,7 @@ OPTIONAL\n \
 \n\
 Copyright 2014 Sourcefabric z.ú. written by $AUTHOR"
 
-while getopts ":hc:n:t:s:e:" opt; do
+while getopts ":hc:d:n:t:s:e:" opt; do
   case $opt in
     n)
       PACKAGENAME=$OPTARG
@@ -64,6 +65,9 @@ while getopts ":hc:n:t:s:e:" opt; do
     e)
       EXCLUDE=$OPTARG
       ;;
+    d)
+      COMPAREPATH=$OPTARG
+      ;;
     h)
       echo -e "$USAGE"
       ;;
@@ -89,13 +93,13 @@ echo -e "\nCreating $PACKAGENAME.zip, $PACKAGENAME.txt and $PACKAGENAME$SLUG.txt
 cd $SOURCEPATH
   if [ -z "$EXCLUDE" ]
     then
-      git archive --format zip -o $PATHPREFIX$PACKAGENAME.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. --)
-      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- >> $PATHPREFIX$PACKAGENAME.txt
+      git archive --format zip -o $PATHPREFIX$PACKAGENAME.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. -- $COMPAREPATH)
+      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- $COMPAREPATH >> $PATHPREFIX$PACKAGENAME.txt
     else
-      git archive --format zip -o $PATHPREFIX$PACKAGENAME.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE")
-      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- |grep -Ev "$EXCLUDE" >> $PATHPREFIX$PACKAGENAME.txt
+      git archive --format zip -o $PATHPREFIX$PACKAGENAME.zip HEAD -- $(git diff-tree --diff-filter=ACMR --no-commit-id --name-only -r $COMMIT^1.. -- $COMPAREPATH |grep -Ev "$EXCLUDE")
+      git diff-tree --no-commit-id --name-status -r $COMMIT^1.. -- $COMPAREPATH |grep -Ev "$EXCLUDE" >> $PATHPREFIX$PACKAGENAME.txt
   fi
-  git log --oneline $COMMIT..HEAD --no-merges >> $PATHPREFIX$PACKAGENAME$SLUG.txt
+  git log --oneline $COMMIT..HEAD --no-merges $COMPAREPATH >> $PATHPREFIX$PACKAGENAME$SLUG.txt
 else
     echo -e "$USAGE"
 fi
