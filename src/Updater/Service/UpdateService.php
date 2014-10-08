@@ -83,7 +83,6 @@ class UpdateService
                     $fs->copy($this->updater->getWorkingDir().'/'.$file['file'], $this->updater->getTempDir().'/oldfiles/'.$file['file']);
                 }
             } elseif (!$exists && $file['type'] == 'update') {
-
                 throw new \Exception($this->updater->getWorkingDir().'/'.$file['file'] . " doesn't exist.");
             }
         }
