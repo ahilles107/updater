@@ -23,6 +23,7 @@ class UpdateServiceSpec extends ObjectBehavior
         $packageService = $updater->getPackageService();
         $packageJson = array(json_decode(file_get_contents(__DIR__ . '/../../packages/update-4.3.1.json'), true));
         $package = $packageService->fillPackage($packageJson[0]);
+        $package->setPackageDir(realpath(__DIR__ . '/../../../spec/packages').'/update-4.3.1.zip');
         $this->setPackage($package);
     }
 
@@ -45,5 +46,10 @@ class UpdateServiceSpec extends ObjectBehavior
     public function it_should_rollback_file_changes()
     {
         $this->rollbackUpdate()->shouldReturn(true);
+    }
+
+    public function it_do_application_update()
+    {
+        $this->doUpdate($this->getPackage())->shouldReturn(true);
     }
 }

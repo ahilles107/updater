@@ -26,7 +26,7 @@ class FilesManager
     /**
      * File with diffrences between commits name
      */
-    const DIFFFILENAME = 'upgrade-diff.json';
+    const DIFFFILENAME = 'update.json';
 
     /**
      * Get packages dir and file name to get update.json content in array
@@ -92,13 +92,13 @@ class FilesManager
         }
 
         $decodedSchema = json_decode($schema, true);
-        $fileMapping = $this->getFileContent($arguments['reference'] . '.txt', $arguments['target']);
+        $fileMapping = $this->getFileContent($arguments['version'] . '.txt', $arguments['target']);
 
         if (!empty($arguments['exclude'])) {
             $fileMapping = $this->exclude($fileMapping, $arguments['exclude']);
         }
 
-        $decodedSchema['changelog'] = $this->getFileContent($arguments['reference'] . '_commits.txt', $arguments['target']);
+        $decodedSchema['changelog'] = $this->getFileContent($arguments['version'] . '_commits.txt', $arguments['target']);
         $decodedSchema['filemapping'] = $fileMapping;
 
         foreach ($decodedSchema as $key => $value) {
@@ -109,7 +109,7 @@ class FilesManager
 
         $filePath = realpath($arguments['target']) . '/' . self::DIFFFILENAME;
         file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0), LOCK_EX);
-        $zipPath = realpath($arguments['target'] . $arguments['reference'] . '.zip');
+        $zipPath = realpath($arguments['target'] . $arguments['version'] . '.zip');
         if ($jsonManager->addJsonToFile($filePath, $zipPath)) {
             $fs->remove(array($filePath));
 
