@@ -14,6 +14,7 @@ namespace Updater\Service;
 use Symfony\Component\Filesystem\Filesystem;
 use Updater\Updater;
 use Updater\Package\Package;
+use Symfony\Component\Finder\Finder;
 
 class UpdateService
 {
@@ -33,13 +34,12 @@ class UpdateService
         $this->updater = $updater;
     }
 
-    public function doUpdate(Package $package)
+    public function doUpdate()
     {
-        $this->setPackage($package);
         $this->copyFilesToTemp();
 
         try {
-            $this->applyFileChanges($package->getPackageDir());
+            $this->applyFileChanges($this->package->getPackageDir());
 
             return true;
         } catch (\Exception $e) {
@@ -51,16 +51,27 @@ class UpdateService
 
     public function rollbackUpdate()
     {
-        $fileMapping = $this->package->getFilemapping();
         $fs = new Filesystem();
+        $fileMapping = $this->includeConfigDir($this->package->getInclude());
+        if (empty($fileMapping)) {
+            $fileMapping = $this->package->getFilemapping();
+        }
 
         foreach ($fileMapping as $file) {
             if ($fs->exists($this->updater->getTempDir().'/oldfiles/'.$file['file']) && $file['type'] == 'update') {
-                $fs->copy($this->updater->getTempDir().'/oldfiles/'.$file['file'], $this->updater->getWorkingDir().'/'.$file['file']);
+                if (is_link($this->updater->getTempDir().'/oldfiles/'.$file['file'])) {
+                    $fs->symlink($this->updater->getTempDir().'/oldfiles/'.$file['file'], $this->updater->getWorkingDir().'/'.$file['file'], true);
+                } else {
+                    $fs->copy($this->updater->getTempDir().'/oldfiles/'.$file['file'], $this->updater->getWorkingDir().'/'.$file['file'], true);
+                }
             } elseif ($fs->exists($this->updater->getWorkingDir().'/'.$file['file']) && $file['type'] == 'add') {
                 $fs->remove($this->updater->getWorkingDir().'/'.$file['file']);
             } elseif ($fs->exists($this->updater->getTempDir().'/oldfiles/'.$file['file']) && $file['type'] == 'remove') {
-                $fs->copy($this->updater->getTempDir().'/oldfiles/'.$file['file'], $this->updater->getWorkingDir().'/'.$file['file']);
+                if (is_link($this->updater->getTempDir().'/oldfiles/'.$file['file'])) {
+                    $fs->symlink($this->updater->getTempDir().'/oldfiles/'.$file['file'], $this->updater->getWorkingDir().'/'.$file['file'], true);
+                } else {
+                    $fs->copy($this->updater->getTempDir().'/oldfiles/'.$file['file'], $this->updater->getWorkingDir().'/'.$file['file'], true);
+                }
             }
         }
 
@@ -69,9 +80,13 @@ class UpdateService
 
     public function copyFilesToTemp()
     {
-        $fileMapping = $this->package->getFilemapping();
         $fs = new Filesystem();
+        $fileMapping = $this->includeConfigDir($this->package->getInclude());
+        if (empty($fileMapping)) {
+            $fileMapping = $this->package->getFilemapping();
+        }
 
+        $this->package->setRealFileMapping($fileMapping);
         $fs->mkdir($this->updater->getTempDir().'/oldfiles/');
         foreach ($fileMapping as $file) {
             $exists = $fs->exists($this->updater->getWorkingDir().'/'.$file['file']);
@@ -88,6 +103,39 @@ class UpdateService
         }
 
         return true;
+    }
+
+    public function includeConfigDir($configDir)
+    {
+        $fileMapping = $this->package->getFilemapping();
+        $finder = new Finder();
+        $fs = new Filesystem();
+        if (!is_null($configDir) && !empty($configDir)) {
+            $workingDirConfig = realpath($this->updater->getWorkingDir().'/'.$configDir);
+            $configFiles = array();
+            if (!is_dir($workingDirConfig)) {
+                throw new \Exception("Directory: " . $workingDirConfig . " doesn't exist.");
+            }
+
+            foreach ($finder->in(realpath($workingDirConfig)) as $item) {
+                $configFiles[] = array(
+                    'file' => str_replace($this->updater->getWorkingDir().'/', '', $item->getRealPath()),
+                    'type' => 'update'
+                );
+            }
+
+            foreach ($fileMapping as $file) {
+                foreach ($configFiles as $key => $value) {
+                    if (strpos($file['file'], $value['file']) !== false) {
+                        unset($configFiles[$key]);
+                    }
+                }
+            }
+
+            return array_merge($fileMapping, $configFiles);
+        }
+
+        return array();
     }
 
     public function applyFileChanges($updatePackage)

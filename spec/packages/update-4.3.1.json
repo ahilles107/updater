@@ -21,8 +21,9 @@
         "M composer.json",
         "M composer.lock",
         "A src/Vendor/Library/NewFile.php",
-        "R src/Vendor/Library/UnwantedFile.php"
+        "D src/Vendor/Library/UnwantedFile.php"
     ],
     "migrations-dir": "migrations/",
-    "composer-action": "install"
+    "composer-action": "install",
+    "include": "config/"
 }

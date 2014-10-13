@@ -50,6 +50,6 @@ class UpdateServiceSpec extends ObjectBehavior
 
     public function it_do_application_update()
     {
-        $this->doUpdate($this->getPackage())->shouldReturn(true);
+        $this->doUpdate()->shouldReturn(true);
     }
 }

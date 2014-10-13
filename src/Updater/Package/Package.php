@@ -73,6 +73,12 @@ class Package
     private $packageDir;
 
     /**
+     * Incldue
+     * @var string
+     */
+    private $include;
+
+    /**
      * Gets the Version name.
      *
      * @return string
@@ -247,6 +253,20 @@ class Package
     }
 
     /**
+     * Set real filemapping
+     *
+     * @param array $fileMapping
+     *
+     * @return self
+     */
+    public function setRealFileMapping($fileMapping)
+    {
+        $this->filemapping = $fileMapping;
+
+        return $this;
+    }
+
+    /**
      * Gets the Path for directory with migrations.
      *
      * @return string
@@ -314,6 +334,30 @@ class Package
     public function setPackageDir($packageDir)
     {
         $this->packageDir = $packageDir;
+
+        return $this;
+    }
+
+    /**
+     * Gets the Incldue.
+     *
+     * @return string
+     */
+    public function getInclude()
+    {
+        return $this->include;
+    }
+
+    /**
+     * Sets the Incldue.
+     *
+     * @param string $include the include
+     *
+     * @return self
+     */
+    public function setInclude($include)
+    {
+        $this->include = $include;
 
         return $this;
     }

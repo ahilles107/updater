@@ -30,6 +30,7 @@ class GeneratePackageCommandSpec extends ObjectBehavior
             'comparePath' => 'src/',
             'source' => __DIR__ . '/../../../../updater',
             'target' => __DIR__ . '/../../packages/',
+            'include' => 'config/',
             'exclude' => array(
                 'schema/updater-schema.json',
                 'bin/phpunit',
@@ -45,6 +46,7 @@ class GeneratePackageCommandSpec extends ObjectBehavior
             new InputArgument('source', InputArgument::OPTIONAL, 'the source directory, defaults to current directory'),
             new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
             new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"'),
+            new InputArgument('include', InputArgument::OPTIONAL, 'directory you want to include in addition (e.g. config folder)'),
             new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package')
         ));
     }

@@ -94,10 +94,6 @@ class FilesManager
         $decodedSchema = json_decode($schema, true);
         $fileMapping = $this->getFileContent($arguments['version'] . '.txt', $arguments['target']);
 
-        if (!empty($arguments['exclude'])) {
-            $fileMapping = $this->exclude($fileMapping, $arguments['exclude']);
-        }
-
         $decodedSchema['changelog'] = $this->getFileContent($arguments['version'] . '_commits.txt', $arguments['target']);
         $decodedSchema['filemapping'] = $fileMapping;
 
