@@ -114,7 +114,7 @@ class UpdateService
             $workingDirConfig = realpath($this->updater->getWorkingDir().'/'.$configDir);
             $configFiles = array();
             if (!is_dir($workingDirConfig)) {
-                throw new \Exception("Directory: " . $workingDirConfig . " doesn't exist.");
+                throw new \Exception("Directory: " . $this->updater->getWorkingDir().'/'.$configDir . " doesn't exist.");
             }
 
             foreach ($finder->in(realpath($workingDirConfig)) as $item) {

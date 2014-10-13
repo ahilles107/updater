@@ -14,5 +14,5 @@
         "+ composer.lock",
         "- src/Vendor/Library/UnwantedFile.php"
     ],
-    "include": "config"
+    "include": "config/"
 }

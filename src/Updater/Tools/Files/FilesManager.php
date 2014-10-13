@@ -103,6 +103,10 @@ class FilesManager
             }
         }
 
+        if (isset($arguments['include']) && isset($arguments['comparePath'])) {
+            $decodedSchema['include'] = preg_replace('#/+#', '/', $arguments['comparePath'] . '/'. $arguments['include']);
+        }
+
         $filePath = realpath($arguments['target']) . '/' . self::DIFFFILENAME;
         file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0), LOCK_EX);
         $zipPath = realpath($arguments['target'] . $arguments['version'] . '.zip');
