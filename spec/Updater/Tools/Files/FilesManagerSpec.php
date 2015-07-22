@@ -38,6 +38,7 @@ class FilesManagerSpec extends ObjectBehavior
             'description' => 'This is test package description',
             'maintainer' => 'Jhon Doe',
             'update-type' => 'security-bugfix',
+            'include' => 'config/',
             'exclude' => array(
                 'schema/updater-schema.json',
                 'bin/phpunit',

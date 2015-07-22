@@ -69,17 +69,15 @@ EOT
         $packageJson = json_decode($diffFile, true);
         $package = $packageService->fillPackage($packageJson);
         $package->setPackageDir(realpath($packageDir));
-
+        $updateService->setPackage($package);
         if ($rollback) {
-            $updateService->setPackage($package);
             $updateService->rollbackUpdate();
-
             $output->writeln('<info>Changes have been rollbacked.</info>');
 
             return true;
         }
 
-        $isUpdated = $updateService->doUpdate($package);
+        $isUpdated = $updateService->doUpdate();
 
         if ($isUpdated) {
             $output->writeln('<info>Your application has been successfully updated.</info>');

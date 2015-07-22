@@ -94,10 +94,6 @@ class FilesManager
         $decodedSchema = json_decode($schema, true);
         $fileMapping = $this->getFileContent($arguments['version'] . '.txt', $arguments['target']);
 
-        if (!empty($arguments['exclude'])) {
-            $fileMapping = $this->exclude($fileMapping, $arguments['exclude']);
-        }
-
         $decodedSchema['changelog'] = $this->getFileContent($arguments['version'] . '_commits.txt', $arguments['target']);
         $decodedSchema['filemapping'] = $fileMapping;
 
@@ -105,6 +101,10 @@ class FilesManager
             if (array_key_exists($key, $arguments)) {
                 $decodedSchema[$key] = $arguments[$key];
             }
+        }
+
+        if (isset($arguments['include']) && isset($arguments['comparePath'])) {
+            $decodedSchema['include'] = preg_replace('#/+#', '/', $arguments['comparePath'] . '/'. $arguments['include']);
         }
 
         $filePath = realpath($arguments['target']) . '/' . self::DIFFFILENAME;

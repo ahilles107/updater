@@ -24,7 +24,8 @@ class PackageService
             ->setUpdateType($update['update-type'])
             ->setChangelog($update['changelog'])
             ->setMaintainer($update['maintainer'])
-            ->setFilemapping($update['filemapping']);
+            ->setFilemapping($update['filemapping'])
+            ->setInclude($update['include']);
 
         return $package;
     }
