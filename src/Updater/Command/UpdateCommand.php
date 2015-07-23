@@ -10,7 +10,6 @@
  */
 
 /**
- * @package Updater
  * @author Rafał Muszyński <rafal.muszynski@sourcefabric.org>
  */
 
@@ -30,7 +29,7 @@ use Updater\Tools\Json\JsonManager;
 class UpdateCommand extends Command
 {
     /**
-     * Configure console command
+     * Configure console command.
      */
     public function configure()
     {
@@ -41,7 +40,7 @@ class UpdateCommand extends Command
                 new InputArgument('target', InputArgument::REQUIRED, 'Your application directory you want to update'),
                 new InputArgument('temp_dir', InputArgument::REQUIRED, 'Directory to your application temp/cache folder'),
                 new InputArgument('package_dir', InputArgument::REQUIRED, 'Package real path (path to your zip package)'),
-                new InputOption('rollback', null, InputOption::VALUE_NONE, 'If set, then changes will be rollbacked.')
+                new InputOption('rollback', null, InputOption::VALUE_NONE, 'If set, then changes will be rollbacked.'),
             ))
             ->setHelp(
 <<<EOT
@@ -58,14 +57,14 @@ EOT
         $packageDir = $input->getArgument('package_dir');
         $rollback = $input->getOption('rollback');
         $updater = new Updater();
-        $jsonManager = new JsonManager();
+        $jsonManager = new JsonManager($packageDir);
         $updater->setPackageService(new PackageService())
-            ->setTempDir(realpath($tempDir))
-            ->setWorkingDir(realpath($targetDir));
+            ->setTempDir($tempDir)
+            ->setWorkingDir($targetDir);
 
         $updateService = new UpdateService($updater);
         $packageService = $updater->getPackageService();
-        $diffFile = $jsonManager->getJsonFromFile('update.json', $packageDir);
+        $diffFile = $jsonManager->getJsonFromFile();
         $packageJson = json_decode($diffFile, true);
         $package = $packageService->fillPackage($packageJson);
         $package->setPackageDir(realpath($packageDir));

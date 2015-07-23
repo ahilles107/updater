@@ -14,32 +14,29 @@ namespace Updater;
 use Updater\Service\PackageService;
 
 /**
- * Updater
+ * Updater.
  *
  * @author Paweł Mikołajczuk <mikolajczuk.private@gmail.com>
  */
 class Updater
 {
-    private $jsonTools;
-
-    private $filesTools;
-
-    private $databaseTools;
-
     /**
-     * Package service
+     * Package service.
+     *
      * @var PackageService
      */
     private $packageService;
 
     /**
-     * Update temp/cache directory
+     * Update temp/cache directory.
+     *
      * @var string
      */
     private $tempDir;
 
     /**
-     * Working project root directory
+     * Working project root directory.
+     *
      * @var string
      */
     private $workingDir;
@@ -63,7 +60,7 @@ class Updater
      */
     public function setTempDir($tempDir)
     {
-        $this->tempDir = $tempDir;
+        $this->tempDir = realpath($tempDir).'/';
 
         return $this;
     }
@@ -111,7 +108,7 @@ class Updater
      */
     public function setWorkingDir($workingDir)
     {
-        $this->workingDir = $workingDir;
+        $this->workingDir = realpath($workingDir).'/';
 
         return $this;
     }

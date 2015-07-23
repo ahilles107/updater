@@ -4,7 +4,6 @@ namespace spec\Updater\Service;
 
 use PhpSpec\ObjectBehavior;
 use Updater\Updater;
-use Updater\Package\Package;
 use Updater\Service\PackageService;
 
 class UpdateServiceSpec extends ObjectBehavior
@@ -21,9 +20,9 @@ class UpdateServiceSpec extends ObjectBehavior
         $this->beConstructedWith($updater);
 
         $packageService = $updater->getPackageService();
-        $packageJson = array(json_decode(file_get_contents(__DIR__ . '/../../packages/update-4.3.1.json'), true));
+        $packageJson = array(json_decode(file_get_contents(__DIR__.'/../../packages/update-valid.json'), true));
         $package = $packageService->fillPackage($packageJson[0]);
-        $package->setPackageDir(realpath(__DIR__ . '/../../../spec/packages').'/update-4.3.1.zip');
+        $package->setPackageDir(realpath(__DIR__.'/../../../spec/packages').'/1.0.0.zip');
         $this->setPackage($package);
     }
 
@@ -39,7 +38,7 @@ class UpdateServiceSpec extends ObjectBehavior
 
     public function it_should_apply_file_changes()
     {
-        $file = realpath(__DIR__ . '/../../../spec/packages').'/update-4.3.1.zip';
+        $file = realpath(__DIR__.'/../../../spec/packages').'/1.0.0.zip';
         $this->applyFileChanges($file)->shouldReturn(true);
     }
 

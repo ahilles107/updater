@@ -1,14 +1,15 @@
 {
-    "description": "This is test package description",
+    "description": "My test description",
     "version": "1.0.0",
-    "update-type": "security-bugfix",
-    "maintainer": "Jhon Doe",
-    "include": "config\/",
+    "update-type": "minor",
+    "maintainer": "Rafa\u0142 Muszy\u0144ski",
     "changelog": [
         "ffd7c16 update readme and add new file",
         "25d5cf1 remove unwanted file'"
     ],
     "filemapping": [
+        "M\tLICENSE",
+        "M\tREADME.md",
         "A\tsrc\/Vendor\/Library\/NewFile.php",
         "D\tsrc\/Vendor\/Library\/UnwantedFile.php"
     ]

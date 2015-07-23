@@ -23,10 +23,10 @@ class UpdateCommandSpec extends ObjectBehavior
     public function let($die)
     {
         $this->arguments = array(
-            'target' => __DIR__ . '/../../sample_app',
-            'temp_dir' => __DIR__ . '/../../sample_app/cache',
-            'package_dir' => __DIR__ . '/../../packages/update-4.3.1.zip',
-            '--rollback'  => false,
+            'target' => __DIR__.'/../../sample_app',
+            'temp_dir' => __DIR__.'/../../sample_app/cache',
+            'package_dir' => __DIR__.'/../../packages/1.0.0.zip',
+            '--rollback' => false,
         );
 
         $this->definitions = array(
@@ -37,7 +37,7 @@ class UpdateCommandSpec extends ObjectBehavior
         );
     }
 
-    public function it_do_update()
+    public function it_does_update()
     {
         $input = new ArrayInput(
             $this->arguments,
@@ -48,7 +48,7 @@ class UpdateCommandSpec extends ObjectBehavior
         $this->execute($input, $output)->shouldReturn(true);
     }
 
-    public function it_do_rollback()
+    public function it_does_rollback()
     {
         $this->arguments['--rollback'] = true;
         $input = new ArrayInput(

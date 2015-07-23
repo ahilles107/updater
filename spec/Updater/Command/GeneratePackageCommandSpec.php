@@ -22,19 +22,18 @@ class GeneratePackageCommandSpec extends ObjectBehavior
     public function let($die)
     {
         $this->arguments = array(
-            'reference' => '89144ee17ce72370766e21d1a767fdbed0a9e8b7',
-            'version' => '4.3.1-RC',
+            'reference' => '6989311ef1d2370897822dc190e06d9be247b668',
+            'version' => '1.0.0',
             'description' => 'This is test package description',
             'maintainer' => 'Jhon Doe',
             'update-type' => 'security-bugfix',
-            'comparePath' => 'src/',
-            'source' => __DIR__ . '/../../../../updater',
-            'target' => __DIR__ . '/../../packages/',
+            'source' => __DIR__.'/../../sample_app/',
+            'target' => __DIR__.'/../../packages/',
             'include' => 'config/',
             'exclude' => array(
-                'schema/updater-schema.json',
-                'bin/phpunit',
-            )
+                'README.md',
+                'LICENSE',
+            ),
         );
 
         $this->definitions = new InputDefinition(array(
@@ -47,7 +46,7 @@ class GeneratePackageCommandSpec extends ObjectBehavior
             new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
             new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"'),
             new InputArgument('include', InputArgument::OPTIONAL, 'directory you want to include in addition (e.g. config folder)'),
-            new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package')
+            new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package'),
         ));
     }
 
@@ -64,7 +63,7 @@ class GeneratePackageCommandSpec extends ObjectBehavior
 
     public function it_fails_to_generate_package()
     {
-        $this->arguments['target'] = __DIR__ . '/../../wrong_directory/';
+        $this->arguments['target'] = __DIR__.'/../../wrong_directory/';
         $input = new ArrayInput(
             $this->arguments,
             $this->definitions
@@ -74,6 +73,21 @@ class GeneratePackageCommandSpec extends ObjectBehavior
 
         $this
         ->shouldThrow('\Exception')
+        ->duringExecute($input, $output);
+    }
+
+    public function it_fails_to_generate_package_when_specified_source_does_not_exist()
+    {
+        $this->arguments['source'] = __DIR__.'/../../wrong_source_directory/';
+        $input = new ArrayInput(
+            $this->arguments,
+            $this->definitions
+        );
+
+        $output = new NullOutput();
+
+        $this
+        ->shouldThrow('\RuntimeException')
         ->duringExecute($input, $output);
     }
 }

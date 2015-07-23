@@ -15,7 +15,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Updater\Command;
 
 /**
- * Updater console application
+ * Updater console application.
  */
 class Application extends BaseApplication
 {
@@ -44,7 +44,7 @@ class Application extends BaseApplication
     }
 
     /**
-     * Initializes all the composer commands
+     * Initializes all the composer commands.
      */
     protected function getDefaultCommands()
     {
@@ -61,6 +61,6 @@ class Application extends BaseApplication
      */
     public function getHelp()
     {
-        return self::$logo . parent::getHelp();
+        return self::$logo.parent::getHelp();
     }
 }

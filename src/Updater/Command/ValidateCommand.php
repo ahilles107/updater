@@ -16,11 +16,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Updater\Tools\Json\JsonManager;
+use Updater\Tools\Json\JsonException;
 
 class ValidateCommand extends Command
 {
     /**
-     * configure
+     * configure.
      */
     public function configure()
     {
@@ -28,7 +29,7 @@ class ValidateCommand extends Command
             ->setName('validate')
             ->setDescription('Validates a update package')
             ->setDefinition(array(
-                new InputArgument('file', InputArgument::REQUIRED, 'path to update package')
+                new InputArgument('file', InputArgument::REQUIRED, 'path to update package'),
             ))
             ->setHelp(
 <<<EOT
@@ -42,42 +43,39 @@ EOT
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
-     * @return boolean
+     * @return bool
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $file = $input->getArgument('file');
+        $filePath = $input->getArgument('file');
 
-        if (!file_exists($file)) {
-            throw new \Exception($file . ' not found.', 1);
+        if (!file_exists($filePath)) {
+            throw new \Exception($filePath.' not found.', 1);
         }
 
-        if (!is_readable($file)) {
-            throw new \Exception($file . ' is not readable.', 1);
+        if (!is_readable($filePath)) {
+            throw new \Exception($filePath.' is not readable.', 1);
         }
 
-        $jsonManager = new JsonManager();
-        $schema = file_get_contents(realpath(__DIR__ . '/../../../schema/') . '/updater-schema.json');
+        $jsonManager = new JsonManager($filePath);
+        $schemaFile = realpath(__DIR__.'/../../../schema/').'/updater-schema.json';
+        $schema = file_get_contents($schemaFile);
 
-        $json = $jsonManager->getJsonFromFile('update.json', realpath($file));
-        $validationResult = $jsonManager->validateJson($json);
+        $json = $jsonManager->getJsonFromFile();
+        try {
+            $jsonManager->validateJson($json);
+            $jsonManager->validateSchema($json, $schema);
+        } catch (JsonException $e) {
+            $output->writeln('<comment>'.$e->getMessage().'</comment>');
+            foreach ((array) $e->getErrors() as $error) {
+                $output->writeln('<error>'.$error.'</error>');
+            }
 
-        if (true !== $validationResult) {
-            $output->writeln('<error>* JSON inside update package isn\'t valid!</error>');
-            $output->writeln('<error>'.$validationResult->getMessage().'<error>');
-
-            return true;
-        } else {
-            $output->writeln('<info>* JSON inside update package is valid!</info>');
+            return false;
         }
 
-        $schemaResult = $jsonManager->validateSchema($json, $schema);
-
-        if (true !== $schemaResult) {
-            $output->writeln('<error>* JSON does not validate!</error>');
-        } else {
-            $output->writeln('<info>* JSON validates against the schema!</info>');
-        }
+        $output->writeln('<info>* Syntax of a JSON string is valid!</info>');
+        $output->writeln('<info>* JSON validates against the schema!</info>');
 
         $packageSpec = json_decode($json, true);
         $output->writeln('<info>Package version:</info>        '.$packageSpec['version']);
@@ -85,7 +83,7 @@ EOT
         $output->writeln('<info>Package maintainer:</info>     '.$packageSpec['maintainer']);
         $output->writeln('<info>Package changelog:</info>      '.implode(', ', $packageSpec['changelog']));
 
-        $output->writeln('<info>* All valid!</info>');
+        $output->writeln('<info>* All is valid!</info>');
 
         return true;
     }
