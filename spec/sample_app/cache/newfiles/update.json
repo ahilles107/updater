@@ -4,12 +4,6 @@
     "update-type": "security-bugfix",
     "maintainer": "Jhon Doe",
     "include": "config\/",
-    "changelog": [
-        "ffd7c16 update readme and add new file",
-        "25d5cf1 remove unwanted file'"
-    ],
-    "filemapping": [
-        "A\tsrc\/Vendor\/Library\/NewFile.php",
-        "D\tsrc\/Vendor\/Library\/UnwantedFile.php"
-    ]
+    "changelog": [],
+    "filemapping": []
 }

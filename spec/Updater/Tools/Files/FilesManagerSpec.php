@@ -15,7 +15,7 @@ class FilesManagerSpec extends ObjectBehavior
     public function let()
     {
         $this->packagesDir = __DIR__.'/../../../packages/';
-        $this->reference = '6989311ef1d2370897822dc190e06d9be247b668';
+        $this->reference = '89144ee17ce72370766e21d1a767fdbed0a9e8b7';
         $this->schemaFile = realpath(__DIR__.'/../../../../schema/').'/updater-schema.json';
     }
 
@@ -26,22 +26,22 @@ class FilesManagerSpec extends ObjectBehavior
 
     public function it_loads_the_update_spec_from_a_zip_file()
     {
-        $this->getSpecFromZip(realpath($this->packagesDir), '1.0.0.zip')->shouldBeArray();
+        $this->getSpecFromZip(realpath($this->packagesDir), 'update-4.3.1.zip')->shouldBeArray();
     }
 
     public function it_creates_json_file_from_schema()
     {
         $arguments = array(
             'reference' => $this->reference,
-            'version' => '1.0.0',
+            'target' => $this->packagesDir,
+            'version' => '4.3.1-RC',
             'description' => 'This is test package description',
             'maintainer' => 'Jhon Doe',
             'update-type' => 'security-bugfix',
-            'target' => $this->packagesDir,
             'include' => 'config/',
             'exclude' => array(
-                'README.md',
-                'LICENSE',
+                'schema/updater-schema.json',
+                'bin/phpunit',
             ),
         );
 

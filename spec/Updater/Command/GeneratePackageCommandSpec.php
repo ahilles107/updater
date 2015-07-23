@@ -22,17 +22,18 @@ class GeneratePackageCommandSpec extends ObjectBehavior
     public function let($die)
     {
         $this->arguments = array(
-            'reference' => '6989311ef1d2370897822dc190e06d9be247b668',
-            'version' => '1.0.0',
+            'reference' => '89144ee17ce72370766e21d1a767fdbed0a9e8b7',
+            'version' => '4.3.1-RC',
             'description' => 'This is test package description',
             'maintainer' => 'Jhon Doe',
             'update-type' => 'security-bugfix',
-            'source' => __DIR__.'/../../sample_app/',
+            'comparePath' => 'src/',
+            'source' => __DIR__.'/../../../../updater',
             'target' => __DIR__.'/../../packages/',
             'include' => 'config/',
             'exclude' => array(
-                'README.md',
-                'LICENSE',
+                'schema/updater-schema.json',
+                'bin/phpunit',
             ),
         );
 

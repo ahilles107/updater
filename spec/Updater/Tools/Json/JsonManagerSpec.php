@@ -12,8 +12,7 @@ class JsonManagerSpec extends ObjectBehavior
     public function let()
     {
         $this->packagesDir = __DIR__.'/../../../packages/';
-
-        $this->beConstructedWith(realpath($this->packagesDir.'1.0.0.zip'));
+        $this->beConstructedWith(realpath($this->packagesDir.'update-4.3.1.zip'));
     }
 
     public function it_is_initializable()
@@ -23,13 +22,7 @@ class JsonManagerSpec extends ObjectBehavior
 
     public function it_gives_me_json_from_zip_file()
     {
-        $this->getJsonFromFile()->shouldBeString();
-    }
-
-    public function it_gives_valid_json()
-    {
-        $json = $this->getJsonFromFile();
-        $this->validateJson($json->getWrappedObject())->shouldReturn(true);
+        $this->getJsonFromFile('update.json', realpath($this->packagesDir.'update-4.3.1.zip'))->shouldBeString();
     }
 
     public function it_gives_valid_schema(Validator $validator)
@@ -52,6 +45,6 @@ class JsonManagerSpec extends ObjectBehavior
 
     public function it_adds_json_file_to_zip_archive()
     {
-        $this->addJsonToFile('update.json', realpath($this->packagesDir.'1.0.0.zip'))->shouldReturn(true);
+        $this->addJsonToFile('update.json', realpath($this->packagesDir.'update-4.3.1.zip'))->shouldReturn(true);
     }
 }

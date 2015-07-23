@@ -25,7 +25,7 @@ class UpdateCommandSpec extends ObjectBehavior
         $this->arguments = array(
             'target' => __DIR__.'/../../sample_app',
             'temp_dir' => __DIR__.'/../../sample_app/cache',
-            'package_dir' => __DIR__.'/../../packages/1.0.0.zip',
+            'package_dir' => __DIR__.'/../../packages/update-4.3.1.zip',
             '--rollback' => false,
         );
 

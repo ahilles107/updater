@@ -20,7 +20,7 @@ class PackageServiceSpec extends ObjectBehavior
 
     public function it_fills_package_content_correctly()
     {
-        $packageJson = array(json_decode(file_get_contents(realpath($this->packagesDir).'/update-valid.json'), true));
+        $packageJson = array(json_decode(file_get_contents(realpath($this->packagesDir).'/update-4.3.1.json'), true));
         $this->fillPackage($packageJson[0]);
     }
 }
