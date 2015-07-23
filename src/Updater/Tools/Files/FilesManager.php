@@ -65,7 +65,7 @@ class FilesManager
                 throw new \Exception('You need to have zip extension enabled');
             }
 
-            if ($zipFileName != null) {
+            if ($zipFileName !== null) {
                 if ($file->getFilename() != $zipFileName) {
                     continue;
                 }
@@ -73,7 +73,7 @@ class FilesManager
 
             $json = $jsonManager->getJsonFromFile($file->getPathname());
 
-            if ($json == false) {
+            if ($json === false) {
                 continue;
             }
 

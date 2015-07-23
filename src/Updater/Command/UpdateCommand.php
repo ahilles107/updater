@@ -21,7 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Updater\Updater;
-use Updater\Package\Package;
 use Updater\Service\PackageService;
 use Updater\Service\UpdateService;
 use Updater\Tools\Json\JsonManager;

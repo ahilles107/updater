@@ -1,2 +1,5 @@
 # Symfony directories
 vendor/*
+bin/jsonlint
+bin/phpspec
+bin/phpunit

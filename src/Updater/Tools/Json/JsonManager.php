@@ -100,7 +100,7 @@ class JsonManager
         $parser = new JsonParser();
 
         $lintResult = $parser->lint($json);
-        if (null === $lintResult) {
+        if (null === $lintResult && !is_bool($json)) {
             return true;
         }
 

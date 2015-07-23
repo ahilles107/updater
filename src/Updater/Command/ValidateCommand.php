@@ -62,6 +62,7 @@ EOT
         $schema = file_get_contents($schemaFile);
 
         $json = $jsonManager->getJsonFromFile();
+
         try {
             $jsonManager->validateJson($json);
             $jsonManager->validateSchema($json, $schema);

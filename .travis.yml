@@ -1,7 +1,15 @@
 language: php
 
-php: [5.3.3, 5.3, 5.4, 5.5]
+php:
+	- 5.3.3
+	- 5.3
+	- 5.4
+	- 5.5
+	- nightly
 
+matrix:
+  allow_failures:
+		php: nightly
 before_script:
   - composer self-update
   - composer install --dev --prefer-source

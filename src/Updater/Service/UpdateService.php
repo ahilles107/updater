@@ -16,6 +16,7 @@ use Updater\Updater;
 use Updater\Package\Package;
 use Symfony\Component\Finder\Finder;
 use Updater\Tools\Files\FilesManager;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class UpdateService
 {
