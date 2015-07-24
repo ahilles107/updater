@@ -76,7 +76,7 @@ EOT
         $commandLine = 'bash '.realpath(__DIR__.$this->scriptsDir).'/getChanged.sh -n "'.$arguments['version'].'"';
         $commandLine = $this->generateParameters($commandLine, $arguments);
         $process = new Process($commandLine);
-        $process->run(function ($type, $buffer) use ($output) {
+        $process->run(function($type, $buffer) use ($output) {
             if (Process::ERR === $type) {
                 $output->writeln('<error>'.$buffer.'</error>');
             } else {
