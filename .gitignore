@@ -3,3 +3,4 @@ vendor/*
 bin/jsonlint
 bin/phpspec
 bin/phpunit
+bin/validate-json
