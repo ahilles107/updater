@@ -3,7 +3,6 @@
     "description": "Update your PHP applications from small update packages, generate update packages with aplication changed files.",
     "keywords": ["update", "upgrade", "php", "applications", "rollback"],
     "homepage": "https://github.com/ahilles107/updater",
-    "version": "1.1.0",
     "type": "library",
     "license": "GPL-3.0",
     "authors": [
