@@ -172,7 +172,7 @@ class FilesManager
     public function exclude(array $fileMapping, array $excludes)
     {
         foreach ($excludes as $value) {
-            $result = array_filter($fileMapping, function ($element) use ($value) {
+            $result = array_filter($fileMapping, function($element) use ($value) {
                 return (strpos($element, $value) === false);
             });
 
