@@ -1,28 +1,9 @@
 {
-    "version": "4.3.1",
-    "description": "First minor release for 4.3 version",
-    "update-type": "minor",
-    "changelog": [
-        "Fix typo in readme file",
-        "Improve speed of application"
-    ],
-    "maintainer": "Paweł Mikołajczuk <mikolajczuk.private@gmail.com>",
-    "scripts":{
-        "pre-update-cmd":[
-            "MyVendor\\Application\\Tools\\Command::preUpdate"
-        ],
-        "post-update-cmd":[
-            "MyVendor\\Application\\Tools\\Command::postUpdate"
-        ]
-    },
-    "filemapping": [
-        "M README.md",
-        "M Version.php",
-        "M composer.json",
-        "M composer.lock",
-        "A src/Vendor/Library/NewFile.php",
-        "R src/Vendor/Library/UnwantedFile.php"
-    ],
-    "migrations-dir": "migrations/",
-    "composer-action": "install"
+    "description": "This is test package description",
+    "version": "1.0.0",
+    "update-type": "security-bugfix",
+    "maintainer": "Jhon Doe",
+    "include": "config\/",
+    "changelog": [],
+    "filemapping": []
 }

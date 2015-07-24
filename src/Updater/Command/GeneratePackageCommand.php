@@ -10,7 +10,6 @@
  */
 
 /**
- * @package Updater
  * @author Rafał Muszyński <rafal.muszynski@sourcefabric.org>
  */
 
@@ -26,28 +25,21 @@ use Updater\Tools\Files\FilesManager;
 class GeneratePackageCommand extends Command
 {
     /**
-     * Target path, where package will be generated to
+     * Target path, where package will be generated to.
      *
      * @var string
      */
-    private $target =  '/../../../packages/';
+    private $target = '/../../../packages/';
 
     /**
-     * Bash scripts directory
+     * Bash scripts directory.
      *
      * @var string
      */
-    private $scriptsDir =  '/../../../bin/';
+    private $scriptsDir = '/../../../bin/';
 
     /**
-     * Schema file path
-     *
-     * @var string
-     */
-    private $schemaPath = '/../../../schema/updater-schema.json';
-
-    /**
-     * Configure console command
+     * Configure console command.
      */
     public function configure()
     {
@@ -61,10 +53,10 @@ class GeneratePackageCommand extends Command
                 new InputArgument('maintainer', InputArgument::REQUIRED, 'Package mainatainer'),
                 new InputArgument('update-type', InputArgument::REQUIRED, 'Update package type (e.g. minor, critical etc.'),
                 new InputArgument('source', InputArgument::OPTIONAL, 'the source directory, defaults to current directory'),
-                new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
-                new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"'),
+                new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\'', realpath(__DIR__.$this->target).'/'),
+                new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"', './'),
                 new InputArgument('include', InputArgument::OPTIONAL, 'directory you want to include in addition (e.g. config folder)'),
-                new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package')
+                new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package', array()),
             ))
             ->setHelp(
 <<<EOT
@@ -80,49 +72,15 @@ EOT
     {
         $arguments = $input->getArguments();
         $filesManager = new FilesManager();
-
-        if (empty($arguments['target'])) {
-            $arguments['target'] = realpath(__DIR__ . $this->target) . '/';
-        }
-
-        if (isset($arguments['exclude']) && empty($arguments['exclude'])) {
-            $arguments['exclude'] = array();
-        }
-
-        if (!file_exists($arguments['target'])) {
-            throw new \Exception($arguments['target'] . ' not found.', 1);
-        }
-
-        if (!is_writable($arguments['target'])) {
-            throw new \Exception($arguments['target'] . ' is not writable.', 1);
-        }
-
-        $commandLine = 'bash ' . realpath(__DIR__ . $this->scriptsDir) . '/getChanged.sh -n "' . $arguments['version'] . '"';
-        if (isset($arguments['comparePath']) && !empty($arguments['comparePath'])) {
-            $commandLine .= ' -d ' . $arguments['comparePath'];
-        } else {
-            $commandLine .= ' -d ./';
-        }
-
-        if (isset($arguments['source']) && !empty($arguments['source'])) {
-            $commandLine .= ' -s ' . $arguments['source'];
-        }
-
-        if (isset($arguments['target']) && !empty($arguments['target'])) {
-            $commandLine .= ' -t ' . $arguments['target'];
-        }
-
-        if (!empty($arguments['exclude'])) {
-            $commandLine .= ' -e ' . '"' . implode('|', $arguments['exclude']) . '"';
-        }
-
-        $commandLine .= ' -c ' . $arguments['reference'];
+        $arguments = $this->validateArguments($arguments);
+        $commandLine = 'bash '.realpath(__DIR__.$this->scriptsDir).'/getChanged.sh -n "'.$arguments['version'].'"';
+        $commandLine = $this->generateParameters($commandLine, $arguments);
         $process = new Process($commandLine);
         $process->run(function ($type, $buffer) use ($output) {
             if (Process::ERR === $type) {
-                $output->writeln('<error>'. $buffer . '</error>');
+                $output->writeln('<error>'.$buffer.'</error>');
             } else {
-                $output->writeln('<info>'. $buffer . '</info>');
+                $output->writeln('<info>'.$buffer.'</info>');
             }
         });
 
@@ -130,10 +88,46 @@ EOT
             throw new \RuntimeException($process->getErrorOutput());
         }
 
-        if ($filesManager->createJsonFileFromSchema(realpath(__DIR__ . $this->schemaPath), $arguments)) {
+        if ($filesManager->createJsonFileFromSchema(realpath(__DIR__.FilesManager::SCHEMA_FILE_PATH), $arguments)) {
             return true;
         }
 
         return false;
+    }
+
+    private function validateArguments(array $arguments)
+    {
+        if (!file_exists($arguments['target'])) {
+            throw new \Exception($arguments['target'].' not found.', 1);
+        }
+
+        if (!is_writable($arguments['target'])) {
+            throw new \Exception($arguments['target'].' is not writable.', 1);
+        }
+
+        return $arguments;
+    }
+
+    private function generateParameters($commandLine, array $arguments)
+    {
+        if (isset($arguments['comparePath']) && !empty($arguments['comparePath'])) {
+            $commandLine .= ' -d '.$arguments['comparePath'];
+        }
+
+        if (isset($arguments['source']) && !empty($arguments['source'])) {
+            $commandLine .= ' -s '.$arguments['source'];
+        }
+
+        if (isset($arguments['target']) && !empty($arguments['target'])) {
+            $commandLine .= ' -t '.$arguments['target'];
+        }
+
+        if (!empty($arguments['exclude'])) {
+            $commandLine .= ' -e '.'"'.implode('|', $arguments['exclude']).'"';
+        }
+
+        $commandLine .= ' -c '.$arguments['reference'];
+
+        return $commandLine;
     }
 }

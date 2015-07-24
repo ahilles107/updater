@@ -10,7 +10,7 @@ class PackageServiceSpec extends ObjectBehavior
 
     public function let()
     {
-        $this->packagesDir = __DIR__ . '/../../packages/';
+        $this->packagesDir = __DIR__.'/../../packages/';
     }
 
     public function it_is_initializable()
@@ -18,9 +18,9 @@ class PackageServiceSpec extends ObjectBehavior
         $this->shouldHaveType('Updater\Service\PackageService');
     }
 
-    public function it_fill_package_correctly()
+    public function it_fills_package_content_correctly()
     {
-        $packageJson = array(json_decode(file_get_contents(realpath($this->packagesDir) . '/update-4.3.1.json'), true));
+        $packageJson = array(json_decode(file_get_contents(realpath($this->packagesDir).'/update-4.3.1.json'), true));
         $this->fillPackage($packageJson[0]);
     }
 }

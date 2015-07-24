@@ -14,9 +14,9 @@ class FilesManagerSpec extends ObjectBehavior
 
     public function let()
     {
-        $this->packagesDir = __DIR__ . '/../../../packages/';
+        $this->packagesDir = __DIR__.'/../../../packages/';
         $this->reference = '89144ee17ce72370766e21d1a767fdbed0a9e8b7';
-        $this->schemaFile = realpath(__DIR__ . '/../../../../schema/') . '/updater-schema.json';
+        $this->schemaFile = realpath(__DIR__.'/../../../../schema/').'/updater-schema.json';
     }
 
     public function it_is_initializable()
@@ -37,12 +37,13 @@ class FilesManagerSpec extends ObjectBehavior
             'version' => '4.3.1-RC',
             'description' => 'This is test package description',
             'maintainer' => 'Jhon Doe',
+            'comparePath' => './',
             'update-type' => 'security-bugfix',
             'include' => 'config/',
             'exclude' => array(
                 'schema/updater-schema.json',
                 'bin/phpunit',
-            )
+            ),
         );
 
         $this->createJsonFileFromSchema($this->schemaFile, $arguments)->shouldReturn(true);
@@ -60,7 +61,7 @@ class FilesManagerSpec extends ObjectBehavior
             'A  bin/jsonlint',
             'A  bin/phpunit',
             'M  schema/updater-schema.json',
-            'D  install/'
+            'D  install/',
         );
 
         $excludes = array(

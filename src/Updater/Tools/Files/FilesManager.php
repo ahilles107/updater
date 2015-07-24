@@ -16,7 +16,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Service to work with package files
+ * Service to work with package files.
  *
  * @author Paweł Mikołajczuk <mikolajczuk.private@gmail.com>
  * @author Rafał Muszyński <rafal.muszynski@sourcefabric.org>
@@ -24,12 +24,27 @@ use Symfony\Component\Filesystem\Filesystem;
 class FilesManager
 {
     /**
-     * File with diffrences between commits name
+     * File with diffrences between commits name.
      */
-    const DIFFFILENAME = 'update.json';
+    const DIFF_FILENAME = 'update.json';
 
     /**
-     * Get packages dir and file name to get update.json content in array
+     * Schema file path.
+     */
+    const SCHEMA_FILE_PATH = '/../../../schema/updater-schema.json';
+
+    /**
+     * Directory in which current app files will be kept.
+     */
+    const OLD_FILES_DIR = 'oldfiles/';
+
+    /**
+     * Directory in which new update files will be kept.
+     */
+    const NEW_FILES_DIR = 'newfiles/';
+
+    /**
+     * Get packages dir and file name to get update.json content in array.
      *
      * @param string $packagesDir Directory with update packages
      * @param string $zipFileName Update package file name
@@ -38,7 +53,7 @@ class FilesManager
      */
     public function getSpecFromZip($packagesDir, $zipFileName = null)
     {
-        $jsonManager = new JsonManager();
+        $jsonManager = new JsonManager($packagesDir);
         $packages = array();
 
         foreach (new \RecursiveDirectoryIterator($packagesDir) as $file) {
@@ -47,18 +62,18 @@ class FilesManager
             }
 
             if (!extension_loaded('zip')) {
-                throw new \Exception("You need to have zip extension enabled");
+                throw new \Exception('You need to have zip extension enabled');
             }
 
-            if ($zipFileName != null) {
+            if ($zipFileName !== null) {
                 if ($file->getFilename() != $zipFileName) {
                     continue;
                 }
             }
 
-            $json = $jsonManager->getJsonFromFile('update.json', $file->getPathname());
+            $json = $jsonManager->getJsonFromFile($file->getPathname());
 
-            if ($json == false) {
+            if ($json === false) {
                 continue;
             }
 
@@ -73,17 +88,18 @@ class FilesManager
     }
 
     /**
-     * Creates JSON file from schema
+     * Creates JSON file from schema.
      *
      * @param string $schemaPath Schema path
      * @param array  $arguments  Array of arguments
      *
-     * @return boolean
+     * @return bool
      */
     public function createJsonFileFromSchema($schemaPath, $arguments)
     {
-        $jsonManager = new JsonManager();
-        $fs = new Filesystem();
+        $zipPath = realpath($arguments['target'].$arguments['version'].'.zip');
+        $jsonManager = new JsonManager($zipPath);
+        $fileSystem = new Filesystem();
         $schema = file_get_contents($schemaPath);
         $validationResult = $jsonManager->validateJson($schema);
 
@@ -91,27 +107,11 @@ class FilesManager
             throw new \Exception('JSON schema is not valid', 1);
         }
 
-        $decodedSchema = json_decode($schema, true);
-        $fileMapping = $this->getFileContent($arguments['version'] . '.txt', $arguments['target']);
-
-        $decodedSchema['changelog'] = $this->getFileContent($arguments['version'] . '_commits.txt', $arguments['target']);
-        $decodedSchema['filemapping'] = $fileMapping;
-
-        foreach ($decodedSchema as $key => $value) {
-            if (array_key_exists($key, $arguments)) {
-                $decodedSchema[$key] = $arguments[$key];
-            }
-        }
-
-        if (isset($arguments['include']) && isset($arguments['comparePath'])) {
-            $decodedSchema['include'] = preg_replace('#/+#', '/', $arguments['comparePath'] . '/'. $arguments['include']);
-        }
-
-        $filePath = realpath($arguments['target']) . '/' . self::DIFFFILENAME;
-        file_put_contents($filePath, json_encode($decodedSchema, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0), LOCK_EX);
-        $zipPath = realpath($arguments['target'] . $arguments['version'] . '.zip');
+        $jsonContent = $this->createJsonContentFrom($schema, $arguments);
+        $filePath = realpath($arguments['target']).'/'.self::DIFF_FILENAME;
+        file_put_contents($filePath, json_encode($jsonContent, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0), LOCK_EX);
         if ($jsonManager->addJsonToFile($filePath, $zipPath)) {
-            $fs->remove(array($filePath));
+            $fileSystem->remove(array($filePath));
 
             return true;
         }
@@ -119,8 +119,29 @@ class FilesManager
         return false;
     }
 
+    private function createJsonContentFrom($schema, array $arguments)
+    {
+        $decodedSchema = json_decode($schema, true);
+        $fileMapping = $this->getFileContent($arguments['version'].'.txt', $arguments['target']);
+        $jsonContent = array();
+        foreach ($decodedSchema['properties'] as $key => $value) {
+            unset($value);
+            if (array_key_exists($key, $arguments) && $arguments[$key] !== null) {
+                $jsonContent[$key] = $arguments[$key];
+            }
+        }
+
+        $jsonContent['changelog'] = $this->getFileContent($arguments['version'].'_commits.txt', $arguments['target']);
+        $jsonContent['filemapping'] = $fileMapping;
+        if ((isset($arguments['include']) && $arguments['include'] !== null)) {
+            $jsonContent['include'] = preg_replace('#/+#', '/', $arguments['comparePath'].'/'.$arguments['include']);
+        }
+
+        return $jsonContent;
+    }
+
     /**
-     * Finds file by given name and given directory then converts it to array
+     * Finds file by given name and given directory then converts it to array.
      *
      * @param string $reference  Commit or TAG
      * @param string $targetPath Target path where txt file is located
@@ -141,7 +162,7 @@ class FilesManager
     }
 
     /**
-     * Exclude files or directories from update package
+     * Exclude files or directories from update package.
      *
      * @param array $fileMapping Array from which files or dirs will be exluded
      * @param array $excludes    Array with values to exclude
@@ -150,7 +171,6 @@ class FilesManager
      */
     public function exclude(array $fileMapping, array $excludes)
     {
-        $result = array();
         foreach ($excludes as $value) {
             $result = array_filter($fileMapping, function ($element) use ($value) {
                 return (strpos($element, $value) === false);
@@ -160,5 +180,26 @@ class FilesManager
         }
 
         return $fileMapping;
+    }
+
+    /**
+     * Checks whether the file exists and is readable
+     * under the specific directory.
+     *
+     * @param string $filePath File path
+     *
+     * @return bool
+     */
+    public function isAccessible($filePath)
+    {
+        if (!file_exists($filePath)) {
+            return false;
+        }
+
+        if (!is_readable($filePath)) {
+            return false;
+        }
+
+        return true;
     }
 }
