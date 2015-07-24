@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Updater\Tools\Json\JsonManager;
 use Updater\Tools\Json\JsonException;
+use Updater\Tools\Files\FilesManager;
 
 class ValidateCommand extends Command
 {
@@ -58,13 +59,10 @@ EOT
         }
 
         $jsonManager = new JsonManager($filePath);
-        $schemaFile = realpath(__DIR__.'/../../../schema/').'/updater-schema.json';
-        $schema = file_get_contents($schemaFile);
-
+        $schema = file_get_contents(realpath(__DIR__.FilesManager::SCHEMA_FILE_PATH));
         $json = $jsonManager->getJsonFromFile();
 
         try {
-            $jsonManager->validateJson($json);
             $jsonManager->validateSchema($json, $schema);
         } catch (JsonException $e) {
             $output->writeln('<comment>'.$e->getMessage().'</comment>');

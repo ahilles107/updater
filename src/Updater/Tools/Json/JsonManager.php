@@ -89,45 +89,20 @@ class JsonManager
     }
 
     /**
-     * Validates the syntax of a JSON string.
-     *
-     * @param string $json
-     *
-     * @return bool
-     */
-    public function validateJson($json)
-    {
-        $parser = new JsonParser();
-
-        $lintResult = $parser->lint($json);
-        if (null === $lintResult && !is_bool($json)) {
-            return true;
-        }
-
-        $errors = array();
-        $errors[] = $lintResult->getMessage();
-        throw new JsonException(
-            sprintf(
-                'Syntax of a "%s" file inside "%s" does not validate.',
-                $this->getFileName(),
-                $this->getFilePath()
-            ),
-            $errors
-        );
-    }
-
-    /**
      * Validates the JSON string if it matches
      * the expected JSON schema.
      *
      * @param string $json
      * @param string $schema
      *
-     * @return bool|array
+     * @return bool
+     *
+     * @throws JsonException
      */
     public function validateSchema($json, $schema)
     {
         $validator = new Validator();
+        $this->validateJson($json);
         $validator->check(json_decode($json), json_decode($schema));
         if (!$validator->isValid()) {
             $errors = array();
@@ -144,6 +119,41 @@ class JsonManager
                 $errors
             );
         }
+
+        return true;
+    }
+
+    /**
+     * Validates the syntax of a JSON string.
+     *
+     * @param string $json
+     *
+     * @return bool true on success
+     *
+     * @throws JsonException
+     */
+    public function validateJson($json)
+    {
+        $parser = new JsonParser();
+        $lintResult = $parser->lint($json);
+        if (null === $lintResult) {
+            if (defined('JSON_ERROR_UTF8') && JSON_ERROR_UTF8 === json_last_error()) {
+                throw new \UnexpectedValueException('"'.$this->getFileName().'" is not UTF-8, could not parse as JSON');
+            }
+
+            return true;
+        }
+
+        $errors = array();
+        $errors[] = $lintResult->getMessage();
+        throw new JsonException(
+            sprintf(
+                'Syntax of a "%s" file inside "%s" does not validate.',
+                $this->getFileName(),
+                $this->getFilePath()
+            ),
+            $errors
+        );
     }
 
     /**
