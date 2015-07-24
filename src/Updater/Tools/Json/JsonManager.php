@@ -85,6 +85,14 @@ class JsonManager
         $updateFile = "zip://{$this->getFilePath()}#$updateFileName";
         $json = file_get_contents($updateFile);
 
+        if (!is_string($json)) {
+            throw new \Exception(sprintf(
+                'Could not fetch content from "%s" file inside "%s"',
+                $this->getFilename(),
+                $this->getFilePath()
+            ));
+        }
+
         return $json;
     }
 
@@ -95,7 +103,7 @@ class JsonManager
      * @param string $json
      * @param string $schema
      *
-     * @return bool
+     * @return bool true on success
      *
      * @throws JsonException
      */
@@ -137,10 +145,6 @@ class JsonManager
         $parser = new JsonParser();
         $lintResult = $parser->lint($json);
         if (null === $lintResult) {
-            if (defined('JSON_ERROR_UTF8') && JSON_ERROR_UTF8 === json_last_error()) {
-                throw new \UnexpectedValueException('"'.$this->getFileName().'" is not UTF-8, could not parse as JSON');
-            }
-
             return true;
         }
 

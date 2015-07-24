@@ -53,10 +53,10 @@ class GeneratePackageCommand extends Command
                 new InputArgument('maintainer', InputArgument::REQUIRED, 'Package mainatainer'),
                 new InputArgument('update-type', InputArgument::REQUIRED, 'Update package type (e.g. minor, critical etc.'),
                 new InputArgument('source', InputArgument::OPTIONAL, 'the source directory, defaults to current directory'),
-                new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\''),
-                new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"'),
+                new InputArgument('target', InputArgument::OPTIONAL, 'the target directory, defaults to \'packages/\'', realpath(__DIR__.$this->target).'/'),
+                new InputArgument('comparePath', InputArgument::OPTIONAL, 'path in the repository from which you want to generate a package, defaults "./"', './'),
                 new InputArgument('include', InputArgument::OPTIONAL, 'directory you want to include in addition (e.g. config folder)'),
-                new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package'),
+                new InputArgument('exclude', InputArgument::IS_ARRAY | InputArgument::OPTIONAL, 'files or directories to exclude from package', array()),
             ))
             ->setHelp(
 <<<EOT
@@ -97,14 +97,6 @@ EOT
 
     private function validateArguments(array $arguments)
     {
-        if (empty($arguments['target'])) {
-            $arguments['target'] = realpath(__DIR__.$this->target).'/';
-        }
-
-        if (isset($arguments['exclude']) && empty($arguments['exclude'])) {
-            $arguments['exclude'] = array();
-        }
-
         if (!file_exists($arguments['target'])) {
             throw new \Exception($arguments['target'].' not found.', 1);
         }
@@ -120,8 +112,6 @@ EOT
     {
         if (isset($arguments['comparePath']) && !empty($arguments['comparePath'])) {
             $commandLine .= ' -d '.$arguments['comparePath'];
-        } else {
-            $commandLine .= ' -d ./';
         }
 
         if (isset($arguments['source']) && !empty($arguments['source'])) {

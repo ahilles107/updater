@@ -37,6 +37,7 @@ class FilesManagerSpec extends ObjectBehavior
             'version' => '4.3.1-RC',
             'description' => 'This is test package description',
             'maintainer' => 'Jhon Doe',
+            'comparePath' => './',
             'update-type' => 'security-bugfix',
             'include' => 'config/',
             'exclude' => array(

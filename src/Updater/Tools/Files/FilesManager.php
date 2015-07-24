@@ -133,8 +133,7 @@ class FilesManager
 
         $jsonContent['changelog'] = $this->getFileContent($arguments['version'].'_commits.txt', $arguments['target']);
         $jsonContent['filemapping'] = $fileMapping;
-        if ((isset($arguments['include']) && $arguments['include'] !== null) &&
-            isset($arguments['comparePath']) && $arguments['comparePath'] !== null) {
+        if ((isset($arguments['include']) && $arguments['include'] !== null)) {
             $jsonContent['include'] = preg_replace('#/+#', '/', $arguments['comparePath'].'/'.$arguments['include']);
         }
 
