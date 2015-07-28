@@ -4,7 +4,7 @@
     "keywords": ["update", "upgrade", "php", "applications", "rollback"],
     "homepage": "https://github.com/ahilles107/updater",
     "type": "library",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Paweł Mikołajczuk",
