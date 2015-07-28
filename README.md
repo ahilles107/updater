@@ -1,12 +1,10 @@
-updater
+About [![Build Status](https://travis-ci.org/ahilles107/updater.svg?branch=master)](https://travis-ci.org/ahilles107/updater) [![Code Climate](https://codeclimate.com/github/ahilles107/updater/badges/gpa.svg)](https://codeclimate.com/github/ahilles107/updater) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ahilles107/updater/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ahilles107/updater/?branch=master)
 =======
 
-Easy update for your php application users.
+Easy update your PHP applications on users servers. 
 
-Provide a tool for easy partial updates of your php app with standarized update packages.
+Update is a tool for easy updates of your php applications with standarized update packages.
 Use Updater services to build your own update ui in your app admin panel.
-
-[![Build Status](https://travis-ci.org/ahilles107/updater.svg?branch=master)](https://travis-ci.org/ahilles107/updater)
 
 
 Documentation
