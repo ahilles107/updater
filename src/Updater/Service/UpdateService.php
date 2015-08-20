@@ -92,7 +92,7 @@ class UpdateService
     private function copyFileFromTempToWorkingDir(array $file, $override = false)
     {
         $fileSystem = new Filesystem();
-        if (is_link($this->updater->getTempDir().$file['file'])) {
+        if ($this->isLink($this->updater->getTempDir().$file['file'])) {
             $fileSystem->symlink(
                 $file['path'],
                 $this->updater->getWorkingDir().$file['file'],
@@ -133,7 +133,7 @@ class UpdateService
     {
         $fileSystem = new Filesystem();
         $filePath = $this->updater->getTempDir().FilesManager::OLD_FILES_DIR.$file['file'];
-        if (is_link($this->updater->getWorkingDir().$file['file'])) {
+        if ($this->isLink($this->updater->getWorkingDir().$file['file'])) {
             $fileSystem->symlink(
                 $this->updater->getWorkingDir().$file['file'],
                 $filePath,
@@ -221,5 +221,10 @@ class UpdateService
     public function getPackage()
     {
         return $this->package;
+    }
+
+    private function isLink($path)
+    {
+       return is_link($path);
     }
 }
