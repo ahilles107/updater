@@ -62,6 +62,10 @@ EOT
         $schema = file_get_contents(realpath(__DIR__.FilesManager::SCHEMA_FILE_PATH));
         $json = $jsonManager->getJsonFromFile();
 
+        if (!is_string($json)) {
+            $output->writeln("<error>Can't read json from file.</error>");
+        }
+
         try {
             $jsonManager->validateSchema($json, $schema);
         } catch (JsonException $e) {
