@@ -129,7 +129,7 @@ class UpdateService
         return true;
     }
 
-    private function copyFileFromWorkingDirToTemp($file, $override = false)
+    private function copyFileFromWorkingDirToTemp(array $file, $override = false)
     {
         $fileSystem = new Filesystem();
         $filePath = $this->updater->getTempDir().FilesManager::OLD_FILES_DIR.$file['file'];

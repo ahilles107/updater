@@ -64,6 +64,8 @@ EOT
 
         if (!is_string($json)) {
             $output->writeln("<error>Can't read json from file.</error>");
+
+            return false;
         }
 
         try {
