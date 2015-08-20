@@ -28,13 +28,6 @@ class UpdateService
 
     private $package;
 
-    // apply package
-    // * validate package
-    // * create copy of upgraded files
-    // * remove files to remove
-    // * update files to upgrade
-    // * run composer action
-
     public function __construct(Updater $updater)
     {
         $this->updater = $updater;
@@ -72,10 +65,12 @@ class UpdateService
     private function copyFiles(array $file, $rollback = false)
     {
         $fileSystem = new Filesystem();
-        $filePath = $this->updater->getTempDir().FilesManager::NEW_FILES_DIR.$file['file'];
+        $dir = FilesManager::NEW_FILES_DIR;
         if ($rollback) {
-            $filePath = $this->updater->getTempDir().FilesManager::OLD_FILES_DIR.$file['file'];
+            $dir = FilesManager::OLD_FILES_DIR;
         }
+
+        $filePath = $this->updater->getTempDir().$dir.$file['file'];
 
         $file['path'] = $filePath;
         if ($fileSystem->exists($filePath)) {
