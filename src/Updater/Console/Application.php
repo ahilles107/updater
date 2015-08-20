@@ -41,19 +41,10 @@ class Application extends BaseApplication
     public function __construct()
     {
         parent::__construct(static::NAME, static::VERSION);
-    }
 
-    /**
-     * Initializes all the composer commands.
-     */
-    protected function getDefaultCommands()
-    {
-        $commands = parent::getDefaultCommands();
-        $commands[] = new Command\ValidateCommand();
-        $commands[] = new Command\GeneratePackageCommand();
-        $commands[] = new Command\UpdateCommand();
-
-        return $commands;
+        $this->add(new Command\ValidateCommand());
+        $this->add(new Command\GeneratePackageCommand());
+        $this->add(new Command\UpdateCommand());
     }
 
     /**
