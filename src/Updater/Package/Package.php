@@ -12,71 +12,81 @@
 namespace Updater\Package;
 
 /**
- * Update informations represented as a class
+ * Update informations represented as a class.
  *
  * @author Paweł Mikołajczuk <mikolajczuk.private@gmail.com>
  */
 class Package
 {
     /**
-     * Version name
+     * Version name.
+     *
      * @var string
      */
-    private $version;
+    protected $version;
 
     /**
-     * Short description for package
+     * Short description for package.
+     *
      * @var string
      */
-    private $description;
+    protected $description;
 
     /**
-     * Type of update
+     * Type of update.
+     *
      * @var string
      */
-    private $updateType;
+    protected $updateType;
 
     /**
-     * Chnagelog
+     * Chnagelog.
+     *
      * @var array
      */
-    private $changelog;
+    protected $changelog;
 
     /**
-     * Name of package maintainer
+     * Name of package maintainer.
+     *
      * @var string
      */
-    private $maintainer;
+    protected $maintainer;
 
     /**
-     * Array with files mapping
+     * Array with files mapping.
+     *
      * @var array
      */
-    private $filemapping;
+    protected $filemapping;
 
     /**
-     * Path for directory with migrations
+     * Path for directory with migrations.
+     *
      * @var string
      */
-    private $migrationsDir;
+    protected $migrationsDir;
 
     /**
-     * Composer action
+     * Composer action.
+     *
      * @var string
      */
-    private $composerAction;
+    protected $composerAction;
 
     /**
-     * Package dir
+     * Package dir.
+     *
      * @var string
      */
-    private $packageDir;
+    protected $packageDir;
 
     /**
-     * Incldue
+     * Incldue.
+     *
      * @var string
      */
-    private $include;
+    protected $include;
 
     /**
      * Gets the Version name.
@@ -218,7 +228,7 @@ class Package
     public function setFilemapping(array $filemapping)
     {
         foreach ($filemapping as $file) {
-            $fileDefinition = substr($file, strpos($file, " ") + 1);
+            $fileDefinition = substr($file, strpos($file, ' ') + 1);
             $type = null;
             if ($file[0] == 'A') {
                 $type = 'add';
@@ -235,7 +245,7 @@ class Package
     }
 
     /**
-     * Add new file to filemapping
+     * Add new file to filemapping.
      *
      * @param string $type
      * @param string $file
@@ -246,14 +256,14 @@ class Package
     {
         $this->filemapping[] = array(
             'type' => $type,
-            'file' => $file
+            'file' => $file,
         );
 
         return $this;
     }
 
     /**
-     * Set real filemapping
+     * Set real filemapping.
      *
      * @param array $fileMapping
      *
