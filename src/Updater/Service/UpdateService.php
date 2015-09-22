@@ -86,6 +86,10 @@ class UpdateService
                 default:
                     break;
             }
+        } else {
+            if ($file['type'] === self::TYPE_ADD) {
+                $fileSystem->remove($this->updater->getWorkingDir().$file['file']);
+            }
         }
     }
 
